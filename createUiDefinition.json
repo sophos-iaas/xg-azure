@@ -1,0 +1,172 @@
+{
+    "handler": "Microsoft.Compute.MultiVm",
+    "version": "0.0.1-preview",
+    "parameters": {
+        "basics": [
+            {
+                "name": "vmName",
+                "type": "Microsoft.Common.TextBox",
+                "label": "VM Name",
+                "toolTip": "The name of the new VM instance.",
+                "constraints": {
+                    "required": true,
+                    "regex": "^[a-zA-Z0-9]{3,24}$",
+                    "validationMessage": "VM names must be between 3 and 24 characters long, and can contain only numbers and letters."
+                }
+            },
+            {
+                "name": "password",
+                "type": "Microsoft.Compute.CredentialsCombo",
+                "label": {
+                    "authenticationType": "Authentication type",
+                    "password": "Password for admin user",
+                    "confirmPassword": "Confirm password",
+                    "sshPublicKey": "SSH public key"
+                },
+                "toolTip": {
+                    "authenticationType": "",
+                    "password": "When connection to the instance via WebUI or ssh, use the password specified here.",
+                    "sshPublicKey": ""
+                },
+                "constraints": {
+                    "required": true
+                },
+                "options": {
+                    "hideConfirmation": false
+                },
+                "osPlatform": "Windows"
+            }
+        ],
+        "steps": [
+            {
+                "name": "instanceDetails",
+                "label": "Instance Details",
+                "subLabel": {
+                    "preValidation": "Configure Instance Details",
+                    "postValidation": "Done"
+                },
+                "bladeTitle": "Instance Details",
+                "elements": [
+                    {
+                        "name": "vmSize",
+                        "type": "Microsoft.Compute.SizeSelector",
+                        "label": "Virtual machine size",
+                        "toolTip": "The size of VM to provision.",
+                        "recommendedSizes": [
+                            "Standard_D3",
+                            "Standard_A3"
+                        ],
+                        "constraints": {
+                            "allowedSizes": [
+                                "Standard_D3",
+                                "Standard_A3",
+                                "Standard_G3",
+                                "Standard_GS3"
+                            ]
+                        },
+                        "osPlatform": "Linux",
+                        "imageReference": {
+                            "publisher": "Canonical",
+                            "offer": "UbuntuServer",
+                            "sku": "14.04.2-LTS"
+                        },
+                        "count": "1"
+                    },
+                    {
+                        "name": "vnetSpec",
+                        "type": "Microsoft.Network.VirtualNetworkCombo",
+                        "label": {
+                            "virtualNetwork": "Virtual Network",
+                            "subnets": "Subnets"
+                        },
+                        "toolTip": {
+                            "virtualNetwork": "Virtual Network the instance will be placed in. <b>Currently only new virtual networks are supported.</b>",
+                            "subnets": "Subnet definitons for WAN and LAN zone. <b>Currently only new subnet definitons are supported.</b>"
+                        },
+                        "defaultValue": {
+                            "name": "VNET",
+                            "addressPrefixSize": "/16"
+                        },
+                        "constraints": {
+                            "minAddressPrefixSize": "/29"
+                        },
+                        "subnets": {
+                            "subnet1": {
+                                "label": "WAN subnet",
+                                "defaultValue": {
+                                    "name": "WAN",
+                                    "addressPrefixSize": "/24"
+                                },
+                                "constraints": {
+                                    "minAddressPrefixSize": "/29",
+                                    "minAddressCount": 1,
+                                    "requireContiguousAddresses": true
+                                }
+                            },
+                            "subnet2": {
+                                "label": "LAN subnet",
+                                "defaultValue": {
+                                    "name": "LAN",
+                                    "addressPrefixSize": "/24"
+                                },
+                                "constraints": {
+                                    "minAddressPrefixSize": "/29",
+                                    "minAddressCount": 4,
+                                    "requireContiguousAddresses": true
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "domainSpec",
+                        "type": "Microsoft.Network.PublicIpAddressCombo",
+                        "label": {
+                            "publicIpAddress": "Public IP name",
+                            "domainNameLabel": "Domain name"
+                        },
+                        "toolTip": {
+                            "publicIpAddress": "Name of Public IP. <b>Currently only new Public IPs are supported.</b>",
+                            "domainNameLabel": "Your instance will be accessible from this domain"
+                        },
+                        "defaultValue": {
+                            "publicIpAddressName": "PublicIP",
+                            "domainNameLabel": ""
+                        },
+                        "constraints": {
+                            "required": {
+                                "domainNameLabel": true
+                            }
+                        },
+                        "options": {
+                            "hideNone": true,
+                            "hideDomainNameLabel": false
+                        }
+                    },
+                    {
+                        "name": "storageSpec",
+                        "type": "Microsoft.Storage.StorageAccountSelector",
+                        "label": "Storage Account",
+                        "toolTip": "Storage account to be used for disk blobs and disgnostics. <b>Currently only new storage accounts are supported.</b>",
+                        "defaultValue": {
+                            "type": "Standard_LRS"
+                        }
+                    }
+                ]
+            }
+        ],
+        "outputs": {
+            "vmName": "[basics('vmName')]",
+            "adminPassword": "[basics('password').password]",
+            "vmSize": "[steps('instanceDetails').vmSize]",
+            "netName": "[steps('instanceDetails').vnetSpec.name]",
+            "netPrefix": "[steps('instanceDetails').vnetSpec.addressPrefix]",
+            "wanName": "[steps('instanceDetails').vnetSpec.subnets.subnet1.name]",
+            "wanPrefix": "[steps('instanceDetails').vnetSpec.subnets.subnet1.addressPrefix]",
+            "lanName": "[steps('instanceDetails').vnetSpec.subnets.subnet2.name]",
+            "lanPrefix": "[steps('instanceDetails').vnetSpec.subnets.subnet2.addressPrefix]",
+            "domainNameLabel": "[steps('instanceDetails').domainSpec.domainNameLabel]",
+            "storageName": "[steps('instanceDetails').storageSpec.name]",
+            "storageType": "[steps('instanceDetails').storageSpec.type]"
+        }
+    }
+}

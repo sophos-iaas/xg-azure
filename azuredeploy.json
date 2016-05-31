@@ -1,0 +1,300 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "adminPassword": {
+            "type": "securestring",
+            "metadata": {
+                "description": "Password for the Virtual Machine."
+            }
+        },
+        "vmName": {
+            "type": "string"
+        },
+        "domainNameLabel": {
+            "type": "string"
+        },
+        "vmSize": {
+            "type": "string"
+        },
+        "netName": {
+            "type": "string"
+        },
+        "netPrefix": {
+            "type": "string"
+        },
+        "wanName": {
+            "type": "string"
+        },
+        "wanPrefix": {
+            "type": "string"
+        },
+        "lanName": {
+            "type": "string"
+        },
+        "lanPrefix": {
+            "type": "string"
+        },
+        "storageName": {
+            "type": "string"
+        },
+        "storageType": {
+            "type": "string"
+        },
+        "storageEndpoint": {
+            "type": "string",
+            "defaultValue": "blob.core.windows.net",
+            "allowedValues": [
+                "blob.azurestack.local",
+                "blob.core.windows.net"
+            ],
+            "metadata": {
+                "description": "Blob storage endpoint"
+            }
+        }
+    },
+    "variables": {
+        "location": "[resourceGroup().location]",
+        "group": "[resourceGroup().name]",
+        "storageAccountName": "sophosxgdemo",
+        "OSDiskName": "SFAZ01_SO01.Verdi.16.01.0.277.payg-prim.vhd",
+        "DataDiskName": "SFAZ01_SO01.Verdi.16.01.0.277.payg-aux.vhd",
+        "imageContainer": "azi",
+        "vhdContainer": "vhds",
+        "nicName": "PortB",
+        "nicName2": "PortA",
+        "publicIPAddressName": "PublicIP",
+        "networkSecurityGroupName": "SecurityGroup",
+        "publicIPAddressType": "Dynamic",
+        "netId": "[resourceId('Microsoft.Network/virtualNetworks',parameters('netName'))]",
+        "wanId": "[concat(variables('netId'),'/subnets/',parameters('wanName'))]",
+        "lanId": "[concat(variables('netId'),'/subnets/',parameters('lanName'))]",
+        "adminUsername": "azureuser",
+        "sshKeyPath": "[concat('/home/',variables('adminUsername'),'/.ssh/authorized_keys')]",
+        "apiVersion": {
+            "resources": {
+                "deployments": "2015-01-01"
+            },
+            "network": "2015-05-01-preview",
+            "storage": "2015-05-01-preview",
+            "compute": "2015-06-15"
+        }
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "name": "[toLower(parameters('storageName'))]",
+            "apiVersion": "[variables('apiVersion').storage]",
+            "location": "[variables('location')]",
+            "properties": {
+                "accountType": "[parameters('storageType')]"
+            }
+        },
+        {
+            "apiVersion": "[variables('apiVersion').network]",
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "name": "[variables('networkSecurityGroupName')]",
+            "location": "[variables('location')]",
+            "tags": {
+                "displayName": "NetworkSecurityGroup"
+            },
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "allow_webui",
+                        "properties": {
+                            "protocol": "tcp",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "4444",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 101,
+                            "direction": "Inbound"
+                        }
+                    },
+                    {
+                        "name": "allow_ssh",
+                        "properties": {
+                            "protocol": "tcp",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "22",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 102,
+                            "direction": "Inbound"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "[variables('apiVersion').network]",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "name": "[variables('publicIPAddressName')]",
+            "location": "[variables('location')]",
+            "properties": {
+                "publicIPAllocationMethod": "[variables('publicIPAddressType')]",
+                "dnsSettings": {
+                    "domainNameLabel": "[parameters('domainNameLabel')]"
+                }
+            }
+        },
+        {
+            "apiVersion": "[variables('apiVersion').network]",
+            "type": "Microsoft.Network/virtualNetworks",
+            "name": "[parameters('netName')]",
+            "location": "[variables('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/networkSecurityGroups/', variables('networkSecurityGroupName'))]"
+            ],
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[parameters('netPrefix')]"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "[parameters('wanName')]",
+                        "properties": {
+                            "addressPrefix": "[parameters('wanPrefix')]",
+                            "networkSecurityGroup": {
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]"
+                            }
+                        }
+                    },
+                    {
+                        "name": "[parameters('lanName')]",
+                        "properties": {
+                            "addressPrefix": "[parameters('lanPrefix')]",
+                            "networkSecurityGroup": {
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "[variables('apiVersion').network]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "name": "[variables('nicName')]",
+            "location": "[variables('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressName'))]",
+                "[concat('Microsoft.Network/virtualNetworks/', parameters('netName'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
+                            },
+                            "subnet": {
+                                "id": "[variables('wanId')]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "[variables('apiVersion').network]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "name": "[variables('nicName2')]",
+            "location": "[variables('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressName'))]",
+                "[concat('Microsoft.Network/virtualNetworks/', parameters('netName'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig2",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[variables('lanId')]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "[variables('apiVersion').compute]",
+            "type": "Microsoft.Compute/virtualMachines",
+            "name": "[parameters('vmName')]",
+            "location": "[variables('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/networkInterfaces/', variables('nicName'))]",
+                "[concat('Microsoft.Network/networkInterfaces/', variables('nicName2'))]",
+                "[concat('Microsoft.Storage/storageAccounts/', parameters('storageName'))]"
+            ],
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[parameters('vmSize')]"
+                },
+                "osProfile": {
+                    "computerName": "[parameters('vmName')]",
+                    "adminUsername": "[variables('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]"
+                },
+                "storageProfile": {
+                    "dataDisks": [
+                        {
+                            "name": "[concat(parameters('vmName'),'-dataDisk')]",
+                            "lun": 0,
+                            "createOption": "FromImage",
+                            "image": {
+                                "uri": "[concat('http://',variables('storageAccountName'),'.', parameters('storageEndpoint'), '/', variables('imageContainer'),'/',variables('DataDiskName'))]"
+                            },
+                            "vhd": {
+                                "uri": "[concat('http://',variables('storageAccountName'),'.', parameters('storageEndpoint'), '/', variables('vhdContainer'),'/',variables('group'),'-aux.vhd')]"
+                            }
+                        }
+                    ],
+                    "osDisk": {
+                        "name": "[concat(parameters('vmName'),'-osDisk')]",
+                        "osType": "linux",
+                        "caching": "ReadWrite",
+                        "createOption": "FromImage",
+                        "image": {
+                            "uri": "[concat('http://',variables('storageAccountName'),'.', parameters('storageEndpoint'), '/', variables('imageContainer'),'/',variables('OSDiskName'))]"
+                        },
+                        "vhd": {
+                            "uri": "[concat('http://',variables('storageAccountName'),'.', parameters('storageEndpoint'), '/', variables('vhdContainer'),'/',variables('group'),'-prim.vhd')]"
+                        }
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName'))]",
+                            "properties": {
+                                "primary": true
+                            }
+                        },
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName2'))]",
+                            "properties": {
+                                "primary": false
+                            }
+                        }
+                    ]
+                },
+                "diagnosticsProfile": {
+                    "bootDiagnostics": {
+                        "enabled": "true",
+                        "storageUri": "[concat('http://',parameters('storageName'),'.', parameters('storageEndpoint'))]"
+                    }
+                }
+            }
+        }
+    ]
+}
