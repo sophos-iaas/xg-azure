@@ -4,6 +4,7 @@ Deployment template to deploy Sophos XG to Azure
 Deploying
 =========
 
+<strong>At the moment you can only deploy in the East US region! We will fix this soon.</strong>
 
 1) Press the button and enter your Azure credentials when prompted.
 
