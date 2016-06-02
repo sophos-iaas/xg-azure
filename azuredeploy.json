@@ -12,34 +12,48 @@
             "type": "string"
         },
         "domainNameLabel": {
-            "type": "string"
+            "type": "string",
+            "metadata": {
+                "description": "Unique DNS name prefix (e.g. sfostest1)"
+            }
         },
         "vmSize": {
-            "type": "string"
+            "type": "string",
+            "defaultValue": "Standard_A3"
         },
         "netName": {
-            "type": "string"
+            "type": "string",
+            "defaultValue": "VNET"
         },
         "netPrefix": {
-            "type": "string"
+            "type": "string",
+            "defaultValue": "10.0.0.0/16"
         },
         "wanName": {
-            "type": "string"
+            "type": "string",
+            "defaultValue": "WAN"
         },
         "wanPrefix": {
-            "type": "string"
+            "type": "string",
+            "defaultValue": "10.0.1.0/24"
         },
         "lanName": {
-            "type": "string"
+            "type": "string",
+            "defaultValue": "LAN"
         },
         "lanPrefix": {
-            "type": "string"
+            "type": "string",
+            "defaultValue": "10.0.2.0/24"
         },
         "storageName": {
-            "type": "string"
+            "type": "string",
+            "metadata": {
+                "description": "Unique storage account name (e.g. sfostest1)"
+            }
         },
         "storageType": {
-            "type": "string"
+            "type": "string",
+            "defaultValue": "Standard_LRS"
         },
         "storageEndpoint": {
             "type": "string",
