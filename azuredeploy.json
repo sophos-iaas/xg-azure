@@ -312,5 +312,11 @@
                 }
             }
         }
-    ]
+    ],
+    "outputs": {
+        "fqdn": {
+            "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))).dnsSettings.fqdn]",
+            "type": "string"
+        }
+    }
 }
