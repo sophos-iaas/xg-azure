@@ -70,10 +70,6 @@
     "variables": {
         "location": "[resourceGroup().location]",
         "group": "[resourceGroup().name]",
-        "storageAccountName": "sophosxgdemo",
-        "OSDiskName": "SFAZ01_SO01.Verdi.16.01.0.277.payg-prim.vhd",
-        "DataDiskName": "SFAZ01_SO01.Verdi.16.01.0.277.payg-aux.vhd",
-        "imageContainer": "azi",
         "vhdContainer": "vhds",
         "nicName": "PortB",
         "nicName2": "PortA",
@@ -92,6 +88,10 @@
             "network": "2016-06-01",
             "storage": "2016-01-01",
             "compute": "2016-03-30"
+        },
+        "imagePublisher": "sophos",
+        "imageOffer": "sophos-xg-firewall-preview",
+        "imageSku": "payg"
     },
     "resources": [
         {
@@ -246,6 +246,11 @@
             "apiVersion": "[variables('apiVersion').compute]",
             "type": "Microsoft.Compute/virtualMachines",
             "name": "[parameters('vmName')]",
+            "plan": {
+                "publisher": "[variables('imagePublisher')]",
+                "product": "[variables('imageOffer')]",
+                "name": "[variables('imageSku')]"
+            },
             "location": "[variables('location')]",
             "dependsOn": [
                 "[concat('Microsoft.Network/networkInterfaces/', variables('nicName'))]",
@@ -262,29 +267,28 @@
                     "adminPassword": "[parameters('adminPassword')]"
                 },
                 "storageProfile": {
+                    "imageReference": {
+                        "publisher": "[variables('imagePublisher')]",
+                        "offer": "[variables('imageOffer')]",
+                        "sku": "[variables('imageSku')]",
+                        "version": "latest"
+                    },
                     "dataDisks": [
                         {
                             "name": "[concat(parameters('vmName'),'-dataDisk')]",
                             "lun": 0,
                             "createOption": "FromImage",
-                            "image": {
-                                "uri": "[concat('http://',variables('storageAccountName'),'.', parameters('storageEndpoint'), '/', variables('imageContainer'),'/',variables('DataDiskName'))]"
-                            },
                             "vhd": {
-                                "uri": "[concat('http://',variables('storageAccountName'),'.', parameters('storageEndpoint'), '/', variables('vhdContainer'),'/',variables('group'),'-aux.vhd')]"
+                                "uri": "[concat('http://',parameters('storageName'),'.', parameters('storageEndpoint'), '/', variables('vhdContainer'),'/',parameters('vmName'),'-aux.vhd')]"
                             }
                         }
                     ],
                     "osDisk": {
                         "name": "[concat(parameters('vmName'),'-osDisk')]",
-                        "osType": "linux",
                         "caching": "ReadWrite",
                         "createOption": "FromImage",
-                        "image": {
-                            "uri": "[concat('http://',variables('storageAccountName'),'.', parameters('storageEndpoint'), '/', variables('imageContainer'),'/',variables('OSDiskName'))]"
-                        },
                         "vhd": {
-                            "uri": "[concat('http://',variables('storageAccountName'),'.', parameters('storageEndpoint'), '/', variables('vhdContainer'),'/',variables('group'),'-prim.vhd')]"
+                            "uri": "[concat('http://',parameters('storageName'),'.', parameters('storageEndpoint'), '/', variables('vhdContainer'),'/',parameters('vmName'),'-prim.vhd')]"
                         }
                     }
                 },

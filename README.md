@@ -4,13 +4,11 @@ Deployment template to deploy Sophos XG to Azure
 Deploying
 =========
 
-<strong>At the moment you can only deploy in the East US region! We will fix this soon.</strong>
-
 1) Press the button and enter your Azure credentials when prompted.
 
 <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FSebastianPoehn%2Fxg-azure%2Fmaster%2Fazuredeploy.json" target="_blank">
     <img src="http://azuredeploy.net/deploybutton.png"/>
-    
+
 </a>
 2) Take a look on the example values for template parameters in azuredeploy.parameters.json
 
