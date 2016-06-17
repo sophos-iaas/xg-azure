@@ -87,12 +87,11 @@
         "sshKeyPath": "[concat('/home/',variables('adminUsername'),'/.ssh/authorized_keys')]",
         "apiVersion": {
             "resources": {
-                "deployments": "2015-01-01"
+                "deployments": "2016-02-01"
             },
-            "network": "2015-05-01-preview",
-            "storage": "2015-05-01-preview",
-            "compute": "2015-06-15"
-        }
+            "network": "2016-06-01",
+            "storage": "2016-01-01",
+            "compute": "2016-03-30"
     },
     "resources": [
         {
@@ -101,8 +100,11 @@
             "apiVersion": "[variables('apiVersion').storage]",
             "location": "[variables('location')]",
             "properties": {
-                "accountType": "[parameters('storageType')]"
-            }
+            },
+            "sku": {
+                "name": "[parameters('storageType')]"
+            },
+            "kind": "Storage"
         },
         {
             "apiVersion": "[variables('apiVersion').network]",
