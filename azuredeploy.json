@@ -65,6 +65,16 @@
             "metadata": {
                 "description": "Blob storage endpoint"
             }
+        },
+        "imageSku": {
+            "type": "string",
+            "defaultValue": "byol",
+            "allowedValues": [
+                "byol"
+            ],
+            "metadata": {
+                "description": "License type to use"
+            }
         }
     },
     "variables": {
@@ -90,8 +100,7 @@
             "compute": "2016-03-30"
         },
         "imagePublisher": "sophos",
-        "imageOffer": "sophos-xg-firewall-preview",
-        "imageSku": "payg"
+        "imageOffer": "sophos-xg-firewall-preview"
     },
     "resources": [
         {
@@ -249,7 +258,7 @@
             "plan": {
                 "publisher": "[variables('imagePublisher')]",
                 "product": "[variables('imageOffer')]",
-                "name": "[variables('imageSku')]"
+                "name": "[parameters('imageSku')]"
             },
             "location": "[variables('location')]",
             "dependsOn": [
@@ -270,7 +279,7 @@
                     "imageReference": {
                         "publisher": "[variables('imagePublisher')]",
                         "offer": "[variables('imageOffer')]",
-                        "sku": "[variables('imageSku')]",
+                        "sku": "[parameters('imageSku')]",
                         "version": "latest"
                     },
                     "dataDisks": [

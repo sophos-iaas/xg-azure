@@ -48,6 +48,25 @@
                 "bladeTitle": "Instance Details",
                 "elements": [
                     {
+                        "name": "license",
+                        "type": "Microsoft.Common.OptionsGroup",
+                        "label": "License Type",
+                        "defaultValue": "PAYG",
+                        "toolTip": "Choose to either pay hourly (PAYG) or buy a license from Sophos (BYOL)",
+                        "constraints": {
+                            "allowedValues": [
+                                {
+                                    "label": "PAYG",
+                                    "value": "payg"
+                                },
+                                {
+                                    "label": "BYOL",
+                                    "value": "byol"
+                                }
+                            ]
+                        }
+                    },
+                    {
                         "name": "vmSize",
                         "type": "Microsoft.Compute.SizeSelector",
                         "label": "Virtual machine size",
@@ -66,9 +85,9 @@
                         },
                         "osPlatform": "Linux",
                         "imageReference": {
-                            "publisher": "Canonical",
-                            "offer": "UbuntuServer",
-                            "sku": "14.04.2-LTS"
+                            "publisher": "sophos",
+                            "offer": "sophos-xg-firewall-preview",
+                            "sku": "[steps('instanceDetails').license]"
                         },
                         "count": "1"
                     },
@@ -166,7 +185,8 @@
             "lanPrefix": "[steps('instanceDetails').vnetSpec.subnets.subnet2.addressPrefix]",
             "domainNameLabel": "[steps('instanceDetails').domainSpec.domainNameLabel]",
             "storageName": "[steps('instanceDetails').storageSpec.name]",
-            "storageType": "[steps('instanceDetails').storageSpec.type]"
+            "storageType": "[steps('instanceDetails').storageSpec.type]",
+            "imageSku": "[steps('instanceDetails').license]"
         }
     }
 }

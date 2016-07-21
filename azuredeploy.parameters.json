@@ -37,6 +37,9 @@
         },
         "storageType": {
             "value": "Standard_LRS"
+        },
+        "imageSku": {
+            "value": "byol"
         }
     }
 }
