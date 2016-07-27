@@ -11,12 +11,6 @@
         "vmName": {
             "type": "string"
         },
-        "domainNameLabel": {
-            "type": "string",
-            "metadata": {
-                "description": "Unique DNS name prefix (e.g. sfostest1)"
-            }
-        },
         "vmSize": {
             "type": "string",
             "defaultValue": "Standard_A3"
@@ -75,18 +69,41 @@
             "metadata": {
                 "description": "License type to use"
             }
+        },
+        "pipDNS": {
+            "type": "string",
+            "metadata": {
+                "description": "Unique DNS name prefix (e.g. sfostest1)"
+            }
+        },
+        "pipName": {
+            "type": "string",
+            "defaultValue": "PublicIP"
+        },
+        "pipNewOrExisting": {
+            "type": "string",
+            "defaultValue": "new",
+            "allowedValues": [
+                "new",
+                "existing"
+            ]
+        },
+        "pipRG": {
+            "type": "string",
+            "defaultValue": ""
         }
     },
     "variables": {
+        "baseUrl": "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/cisco-csr-1000v/",
+        "pipTemplate": "[concat(variables('baseUrl'),'/publicip-',parameters('pipNewOrExisting'),'.json')]",
         "location": "[resourceGroup().location]",
         "group": "[resourceGroup().name]",
         "vhdContainer": "vhds",
         "nicName": "PortB",
         "nicName2": "PortA",
-        "publicIPAddressName": "PublicIP",
         "networkSecurityGroupName": "SecurityGroup",
         "routeTableName": "RouteTable",
-        "publicIPAddressType": "Dynamic",
+        "pipType": "Dynamic",
         "netId": "[resourceId('Microsoft.Network/virtualNetworks',parameters('netName'))]",
         "wanId": "[concat(variables('netId'),'/subnets/',parameters('wanName'))]",
         "lanId": "[concat(variables('netId'),'/subnets/',parameters('lanName'))]",
@@ -157,14 +174,28 @@
             }
         },
         {
-            "apiVersion": "[variables('apiVersion').network]",
-            "type": "Microsoft.Network/publicIPAddresses",
-            "name": "[variables('publicIPAddressName')]",
-            "location": "[variables('location')]",
+            "name": "SettingUpPublicIP",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "[variables('apiVersion').resources.deployments]",
             "properties": {
-                "publicIPAllocationMethod": "[variables('publicIPAddressType')]",
-                "dnsSettings": {
-                    "domainNameLabel": "[parameters('domainNameLabel')]"
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('pipTemplate')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "publicIPAddressName": {
+                        "value": "[parameters('pipName')]"
+                    },
+                    "publicIPAddressType": {
+                        "value": "[variables('pipType')]"
+                    },
+                    "dnsPrefix": {
+                        "value": "[parameters('pipDNS')]"
+                    },
+                    "publicIpRGName": {
+                        "value": "[parameters('pipRG')]"
+                    }
                 }
             }
         },
@@ -231,7 +262,7 @@
             "name": "[variables('nicName')]",
             "location": "[variables('location')]",
             "dependsOn": [
-                "[concat('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressName'))]",
+                "[concat('Microsoft.Resources/deployments/', 'SettingUpPublicIP')]",
                 "[concat('Microsoft.Network/virtualNetworks/', parameters('netName'))]"
             ],
             "properties": {
@@ -241,7 +272,7 @@
                         "properties": {
                             "privateIPAllocationMethod": "Dynamic",
                             "publicIPAddress": {
-                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
+                                "id": "[reference('SettingUpPublicIP').outputs.publicIpId.value]"
                             },
                             "subnet": {
                                 "id": "[variables('wanId')]"
@@ -258,7 +289,7 @@
             "name": "[variables('nicName2')]",
             "location": "[variables('location')]",
             "dependsOn": [
-                "[concat('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressName'))]",
+                "[concat('Microsoft.Resources/deployments/', 'SettingUpPublicIP')]",
                 "[concat('Microsoft.Network/virtualNetworks/', parameters('netName'))]"
             ],
             "properties": {
@@ -350,11 +381,5 @@
                 }
             }
         }
-    ],
-    "outputs": {
-        "fqdn": {
-            "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))).dnsSettings.fqdn]",
-            "type": "string"
-        }
-    }
+    ]
 }

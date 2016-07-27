@@ -183,10 +183,13 @@
             "wanPrefix": "[steps('instanceDetails').vnetSpec.subnets.subnet1.addressPrefix]",
             "lanName": "[steps('instanceDetails').vnetSpec.subnets.subnet2.name]",
             "lanPrefix": "[steps('instanceDetails').vnetSpec.subnets.subnet2.addressPrefix]",
-            "domainNameLabel": "[steps('instanceDetails').domainSpec.domainNameLabel]",
             "storageName": "[steps('instanceDetails').storageSpec.name]",
             "storageType": "[steps('instanceDetails').storageSpec.type]",
-            "imageSku": "[steps('instanceDetails').license]"
+            "imageSku": "[steps('instanceDetails').license]",
+            "pipDNS": "[steps('instanceDetails').domainSpec.domainNameLabel]",
+            "pipName": "[steps('instanceDetails').domainSpec.name]",
+            "pipNewOrExisting": "[steps('instanceDetails').domainSpec.newOrExistingOrNone]",
+            "pipRG": "[steps('instanceDetails').domainSpec.resourceGroup]"
         }
     }
 }

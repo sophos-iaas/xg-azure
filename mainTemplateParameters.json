@@ -8,9 +8,6 @@
         "adminPassword": {
             "value": "insertYourPasswordHere"
         },
-        "domainNameLabel": {
-            "value": "xgazure"
-        },
         "vmSize": {
             "value": "Standard_A3"
         },
@@ -40,6 +37,9 @@
         },
         "imageSku": {
             "value": "byol"
+        },
+        "pipDNS": {
+            "value": "sfostest6"
         }
     }
 }
