@@ -214,7 +214,7 @@
             "properties": {
                 "ipConfigurations": [
                     {
-                        "name": "ipconfig1",
+                        "name": "ipconfig",
                         "properties": {
                             "privateIPAllocationMethod": "Dynamic",
                             "publicIPAddress": {
@@ -225,7 +225,8 @@
                             }
                         }
                     }
-                ]
+                ],
+                "enableIPForwarding": true
             }
         },
         {
@@ -240,7 +241,7 @@
             "properties": {
                 "ipConfigurations": [
                     {
-                        "name": "ipconfig2",
+                        "name": "ipconfig",
                         "properties": {
                             "privateIPAllocationMethod": "Dynamic",
                             "subnet": {
@@ -248,7 +249,8 @@
                             }
                         }
                     }
-                ]
+                ],
+                "enableIPForwarding": true
             }
         },
         {
