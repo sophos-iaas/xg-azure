@@ -85,6 +85,7 @@
         "nicName2": "PortA",
         "publicIPAddressName": "PublicIP",
         "networkSecurityGroupName": "SecurityGroup",
+        "routeTableName": "RouteTable",
         "publicIPAddressType": "Dynamic",
         "netId": "[resourceId('Microsoft.Network/virtualNetworks',parameters('netName'))]",
         "wanId": "[concat(variables('netId'),'/subnets/',parameters('wanName'))]",
@@ -109,6 +110,7 @@
             "apiVersion": "[variables('apiVersion').storage]",
             "location": "[variables('location')]",
             "properties": {
+
             },
             "sku": {
                 "name": "[parameters('storageType')]"
@@ -197,6 +199,27 @@
                             "networkSecurityGroup": {
                                 "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]"
                             }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Network/routeTables",
+            "name": "[variables('routeTableName')]",
+            "apiVersion": "[variables('apiVersion').network]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/networkInterfaces/', variables('nicName2'))]"
+            ],
+            "properties": {
+                "routes": [
+                    {
+                        "name": "DefaultViaXG",
+                        "properties": {
+                            "addressPrefix": "0.0.0.0/0",
+                            "nextHopType": "VirtualAppliance",
+                            "nextHopIpAddress": "[reference(resourceId('Microsoft.Network/networkInterfaces',variables('nicName2'))).ipConfigurations[0].properties.privateIPAddress]"
                         }
                     }
                 ]
