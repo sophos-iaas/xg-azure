@@ -204,9 +204,6 @@
             "type": "Microsoft.Network/virtualNetworks",
             "name": "[parameters('netName')]",
             "location": "[variables('location')]",
-            "dependsOn": [
-                "[concat('Microsoft.Network/networkSecurityGroups/', variables('networkSecurityGroupName'))]"
-            ],
             "properties": {
                 "addressSpace": {
                     "addressPrefixes": [
@@ -217,19 +214,13 @@
                     {
                         "name": "[parameters('wanName')]",
                         "properties": {
-                            "addressPrefix": "[parameters('wanPrefix')]",
-                            "networkSecurityGroup": {
-                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]"
-                            }
+                            "addressPrefix": "[parameters('wanPrefix')]"
                         }
                     },
                     {
                         "name": "[parameters('lanName')]",
                         "properties": {
-                            "addressPrefix": "[parameters('lanPrefix')]",
-                            "networkSecurityGroup": {
-                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]"
-                            }
+                            "addressPrefix": "[parameters('lanPrefix')]"
                         }
                     }
                 ]
@@ -263,9 +254,13 @@
             "location": "[variables('location')]",
             "dependsOn": [
                 "[concat('Microsoft.Resources/deployments/', 'SettingUpPublicIP')]",
-                "[concat('Microsoft.Network/virtualNetworks/', parameters('netName'))]"
+                "[concat('Microsoft.Network/virtualNetworks/', parameters('netName'))]",
+                "[concat('Microsoft.Network/networkSecurityGroups/', variables('networkSecurityGroupName'))]"
             ],
             "properties": {
+                "networkSecurityGroup": {
+                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]"
+                },
                 "ipConfigurations": [
                     {
                         "name": "ipconfig",
@@ -289,7 +284,6 @@
             "name": "[variables('nicName2')]",
             "location": "[variables('location')]",
             "dependsOn": [
-                "[concat('Microsoft.Resources/deployments/', 'SettingUpPublicIP')]",
                 "[concat('Microsoft.Network/virtualNetworks/', parameters('netName'))]"
             ],
             "properties": {
