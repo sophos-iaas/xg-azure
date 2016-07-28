@@ -2,62 +2,17 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
+        "vmName": {
+            "type": "string",
+            "defaultValue": "XG-Firewall",
+            "metadata": {
+                "description": "Name for the Virtual Machine."
+            }
+        },
         "adminPassword": {
             "type": "securestring",
             "metadata": {
                 "description": "Password for the Virtual Machine."
-            }
-        },
-        "vmName": {
-            "type": "string"
-        },
-        "vmSize": {
-            "type": "string",
-            "defaultValue": "Standard_A3"
-        },
-        "netName": {
-            "type": "string",
-            "defaultValue": "VNET"
-        },
-        "netPrefix": {
-            "type": "string",
-            "defaultValue": "10.0.0.0/16"
-        },
-        "wanName": {
-            "type": "string",
-            "defaultValue": "WAN"
-        },
-        "wanPrefix": {
-            "type": "string",
-            "defaultValue": "10.0.1.0/24"
-        },
-        "lanName": {
-            "type": "string",
-            "defaultValue": "LAN"
-        },
-        "lanPrefix": {
-            "type": "string",
-            "defaultValue": "10.0.2.0/24"
-        },
-        "storageName": {
-            "type": "string",
-            "metadata": {
-                "description": "Unique storage account name (e.g. sfostest1)"
-            }
-        },
-        "storageType": {
-            "type": "string",
-            "defaultValue": "Standard_LRS"
-        },
-        "storageEndpoint": {
-            "type": "string",
-            "defaultValue": "blob.core.windows.net",
-            "allowedValues": [
-                "blob.azurestack.local",
-                "blob.core.windows.net"
-            ],
-            "metadata": {
-                "description": "Blob storage endpoint"
             }
         },
         "imageSku": {
@@ -67,18 +22,57 @@
                 "byol"
             ],
             "metadata": {
-                "description": "License type to use"
+                "description": "License type to use."
             }
         },
-        "pipDNS": {
+        "vmSize": {
             "type": "string",
+            "defaultValue": "Standard_A3",
             "metadata": {
-                "description": "Unique DNS name prefix (e.g. sfostest1)"
+                "description": "Size of the Virtual Machine."
             }
         },
-        "pipName": {
+        "netName": {
             "type": "string",
-            "defaultValue": "PublicIP"
+            "defaultValue": "VNET",
+            "metadata": {
+                "description": "Name of the Virtual Network."
+            }
+        },
+        "netPrefix": {
+            "type": "string",
+            "defaultValue": "10.0.0.0/16",
+            "metadata": {
+                "description": "Prefix for the Virtual Network."
+            }
+        },
+        "wanName": {
+            "type": "string",
+            "defaultValue": "WAN",
+            "metadata": {
+                "description": "Name of the WAN side Subnet."
+            }
+        },
+        "wanPrefix": {
+            "type": "string",
+            "defaultValue": "10.0.1.0/24",
+            "metadata": {
+                "description": "Prefix for the WAN side Subnet."
+            }
+        },
+        "lanName": {
+            "type": "string",
+            "defaultValue": "LAN",
+            "metadata": {
+                "description": "Name of the LAN side Subnet."
+            }
+        },
+        "lanPrefix": {
+            "type": "string",
+            "defaultValue": "10.0.2.0/24",
+            "metadata": {
+                "description": "Prefix for the LAN side Subnet."
+            }
         },
         "pipNewOrExisting": {
             "type": "string",
@@ -86,11 +80,54 @@
             "allowedValues": [
                 "new",
                 "existing"
-            ]
+            ],
+            "metadata": {
+                "description": "Create new Public IP or us an existing one."
+            }
         },
         "pipRG": {
             "type": "string",
-            "defaultValue": ""
+            "defaultValue": "",
+            "metadata": {
+                "description": "Resource Group of existing Public IP (optional)."
+            }
+        },
+        "pipName": {
+            "type": "string",
+            "defaultValue": "PublicIP",
+            "metadata": {
+                "description": "Name of the Public IP."
+            }
+        },
+        "pipDNS": {
+            "type": "string",
+            "metadata": {
+                "description": "Unique DNS name prefix for Public IP."
+            }
+        },
+        "storageName": {
+            "type": "string",
+            "metadata": {
+                "description": "Unique name for Storage Account."
+            }
+        },
+        "storageType": {
+            "type": "string",
+            "defaultValue": "Standard_LRS",
+            "metadata": {
+                "description": "Replication mode for Storage Account."
+            }
+        },
+        "storageEndpoint": {
+            "type": "string",
+            "defaultValue": "blob.core.windows.net",
+            "allowedValues": [
+                "blob.azurestack.local",
+                "blob.core.windows.net"
+            ],
+            "metadata": {
+                "description": " Endpoint for Storage Account."
+            }
         }
     },
     "variables": {
