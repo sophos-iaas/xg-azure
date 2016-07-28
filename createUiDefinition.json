@@ -177,6 +177,8 @@
             "vmName": "[basics('vmName')]",
             "adminPassword": "[basics('password').password]",
             "vmSize": "[steps('instanceDetails').vmSize]",
+            "netNewOrExisting": "[steps('instanceDetails').vnetSpec.newOrExisting]",
+            "netRG": "[steps('instanceDetails').vnetSpec.resourceGroup]",
             "netName": "[steps('instanceDetails').vnetSpec.name]",
             "netPrefix": "[steps('instanceDetails').vnetSpec.addressPrefix]",
             "wanName": "[steps('instanceDetails').vnetSpec.subnets.subnet1.name]",

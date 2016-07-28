@@ -32,6 +32,24 @@
                 "description": "Size of the Virtual Machine."
             }
         },
+        "netNewOrExisting": {
+            "type": "string",
+            "defaultValue": "new",
+            "allowedValues": [
+                "new",
+                "existing"
+            ],
+            "metadata": {
+                "description": "Create new Virtual Network or us an existing one."
+            }
+        },
+        "netRG": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Resource Group of existing Virtual Network (optional)."
+            }
+        },
         "netName": {
             "type": "string",
             "defaultValue": "VNET",
@@ -133,6 +151,7 @@
     "variables": {
         "baseUrl": "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/cisco-csr-1000v/",
         "pipTemplate": "[concat(variables('baseUrl'),'/publicip-',parameters('pipNewOrExisting'),'.json')]",
+        "netTemplate": "[concat(variables('baseUrl'),'/vnet-',parameters('netNewOrExisting'),'.json')]",
         "location": "[resourceGroup().location]",
         "group": "[resourceGroup().name]",
         "vhdContainer": "vhds",
@@ -141,9 +160,6 @@
         "networkSecurityGroupName": "SecurityGroup",
         "routeTableName": "RouteTable",
         "pipType": "Dynamic",
-        "netId": "[resourceId('Microsoft.Network/virtualNetworks',parameters('netName'))]",
-        "wanId": "[concat(variables('netId'),'/subnets/',parameters('wanName'))]",
-        "lanId": "[concat(variables('netId'),'/subnets/',parameters('lanName'))]",
         "adminUsername": "azureuser",
         "sshKeyPath": "[concat('/home/',variables('adminUsername'),'/.ssh/authorized_keys')]",
         "apiVersion": {
@@ -237,30 +253,38 @@
             }
         },
         {
-            "apiVersion": "[variables('apiVersion').network]",
-            "type": "Microsoft.Network/virtualNetworks",
-            "name": "[parameters('netName')]",
-            "location": "[variables('location')]",
+            "name": "SettingUpVirtualNetwork",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "[variables('apiVersion').resources.deployments]",
             "properties": {
-                "addressSpace": {
-                    "addressPrefixes": [
-                        "[parameters('netPrefix')]"
-                    ]
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('netTemplate')]",
+                    "contentVersion": "1.0.0.0"
                 },
-                "subnets": [
-                    {
-                        "name": "[parameters('wanName')]",
-                        "properties": {
-                            "addressPrefix": "[parameters('wanPrefix')]"
-                        }
+                "parameters": {
+                    "virtualNetworkName": {
+                        "value": "[parameters('netName')]"
                     },
-                    {
-                        "name": "[parameters('lanName')]",
-                        "properties": {
-                            "addressPrefix": "[parameters('lanPrefix')]"
-                        }
+                    "virtualNetworkAddressPrefix": {
+                        "value": "[parameters('netPrefix')]"
+                    },
+                    "Subnet1Name": {
+                        "value": "[parameters('wanName')]"
+                    },
+                    "Subnet1Prefix": {
+                        "value": "[parameters('wanPrefix')]"
+                    },
+                    "Subnet2Name": {
+                        "value": "[parameters('lanName')]"
+                    },
+                    "Subnet2Prefix": {
+                        "value": "[parameters('lanPrefix')]"
+                    },
+                    "vnetExistingRGName": {
+                        "value": "[parameters('netRG')]"
                     }
-                ]
+                }
             }
         },
         {
@@ -269,6 +293,7 @@
             "apiVersion": "[variables('apiVersion').network]",
             "location": "[resourceGroup().location]",
             "dependsOn": [
+                "[concat('Microsoft.Resources/deployments/', 'SettingUpVirtualNetwork')]",
                 "[concat('Microsoft.Network/networkInterfaces/', variables('nicName2'))]"
             ],
             "properties": {
@@ -291,7 +316,7 @@
             "location": "[variables('location')]",
             "dependsOn": [
                 "[concat('Microsoft.Resources/deployments/', 'SettingUpPublicIP')]",
-                "[concat('Microsoft.Network/virtualNetworks/', parameters('netName'))]",
+                "[concat('Microsoft.Resources/deployments/', 'SettingUpVirtualNetwork')]",
                 "[concat('Microsoft.Network/networkSecurityGroups/', variables('networkSecurityGroupName'))]"
             ],
             "properties": {
@@ -307,7 +332,7 @@
                                 "id": "[reference('SettingUpPublicIP').outputs.publicIpId.value]"
                             },
                             "subnet": {
-                                "id": "[variables('wanId')]"
+                                "id": "[reference('SettingUpVirtualNetwork','2015-01-01').outputs.subnet1Ref.value]"
                             }
                         }
                     }
@@ -321,7 +346,7 @@
             "name": "[variables('nicName2')]",
             "location": "[variables('location')]",
             "dependsOn": [
-                "[concat('Microsoft.Network/virtualNetworks/', parameters('netName'))]"
+                "[concat('Microsoft.Resources/deployments/', 'SettingUpVirtualNetwork')]"
             ],
             "properties": {
                 "ipConfigurations": [
@@ -330,7 +355,7 @@
                         "properties": {
                             "privateIPAllocationMethod": "Dynamic",
                             "subnet": {
-                                "id": "[variables('lanId')]"
+                                "id": "[reference('SettingUpVirtualNetwork','2015-01-01').outputs.subnet2Ref.value]"
                             }
                         }
                     }
