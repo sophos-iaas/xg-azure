@@ -149,7 +149,7 @@
         }
     },
     "variables": {
-        "baseUrl": "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/cisco-csr-1000v/",
+        "baseUrl": "https://raw.githubusercontent.com/sophos-iaas/xg-azure/master",
         "pipTemplate": "[concat(variables('baseUrl'),'/publicip-',parameters('pipNewOrExisting'),'.json')]",
         "netTemplate": "[concat(variables('baseUrl'),'/vnet-',parameters('netNewOrExisting'),'.json')]",
         "location": "[resourceGroup().location]",
