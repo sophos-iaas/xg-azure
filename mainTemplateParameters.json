@@ -38,7 +38,7 @@
         "imageSku": {
             "value": "byol"
         },
-        "pipDNS": {
+        "publicIpDNS": {
             "value": "sfostest6"
         }
     }

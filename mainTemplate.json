@@ -92,7 +92,7 @@
                 "description": "Prefix for the LAN side Subnet."
             }
         },
-        "pipNewOrExisting": {
+        "publicIpNewOrExisting": {
             "type": "string",
             "defaultValue": "new",
             "allowedValues": [
@@ -103,21 +103,21 @@
                 "description": "Create new Public IP or us an existing one."
             }
         },
-        "pipRG": {
+        "publicIpRG": {
             "type": "string",
             "defaultValue": "",
             "metadata": {
                 "description": "Resource Group of existing Public IP (optional)."
             }
         },
-        "pipName": {
+        "publicIpName": {
             "type": "string",
             "defaultValue": "PublicIP",
             "metadata": {
                 "description": "Name of the Public IP."
             }
         },
-        "pipDNS": {
+        "publicIpDNS": {
             "type": "string",
             "metadata": {
                 "description": "Unique DNS name prefix for Public IP."
@@ -150,7 +150,7 @@
     },
     "variables": {
         "baseUrl": "https://raw.githubusercontent.com/sophos-iaas/xg-azure/master",
-        "pipTemplate": "[concat(variables('baseUrl'),'/publicip-',parameters('pipNewOrExisting'),'.json')]",
+        "publicIpTemplate": "[concat(variables('baseUrl'),'/publicip-',parameters('publicIpNewOrExisting'),'.json')]",
         "netTemplate": "[concat(variables('baseUrl'),'/vnet-',parameters('netNewOrExisting'),'.json')]",
         "location": "[resourceGroup().location]",
         "group": "[resourceGroup().name]",
@@ -159,7 +159,7 @@
         "nicLan": "PortA",
         "networkSecurityGroupName": "SecurityGroup",
         "routeTableName": "RouteTable",
-        "pipType": "Dynamic",
+        "publicIpType": "Dynamic",
         "adminUsername": "azureuser",
         "sshKeyPath": "[concat('/home/',variables('adminUsername'),'/.ssh/authorized_keys')]",
         "apiVersion": {
@@ -233,21 +233,21 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[variables('pipTemplate')]",
+                    "uri": "[variables('publicIpTemplate')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
                     "publicIPAddressName": {
-                        "value": "[parameters('pipName')]"
+                        "value": "[parameters('publicIpName')]"
                     },
                     "publicIPAddressType": {
-                        "value": "[variables('pipType')]"
+                        "value": "[variables('publicIpType')]"
                     },
                     "dnsPrefix": {
-                        "value": "[parameters('pipDNS')]"
+                        "value": "[parameters('publicIpDNS')]"
                     },
                     "publicIpRGName": {
-                        "value": "[parameters('pipRG')]"
+                        "value": "[parameters('publicIpRG')]"
                     }
                 }
             }
