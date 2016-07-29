@@ -12,7 +12,7 @@ Deploying
 </a>
 2) Take a look on the example values for template parameters in mainTemplateParameters.json
 
-**If invalid parametes are passed, the deployment will fail. Especially note that the adminPassword has to be minimum 8 characters, consisting out of at least one small, uppercase letter, number and special character.**
+**If invalid parameters are passed, the deployment will fail. Especially note that the adminPassword has to be minimum 8 characters, consisting out of at least one small, uppercase letter, number and special character.**
 
 3) Deployment will start
 
@@ -34,7 +34,7 @@ Device Registration
 
 3) Register the device and follow the instructions
 
-4) Make sure the license is syncronized
+4) Make sure the license is synchronized
 
 ***
 
