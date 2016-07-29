@@ -149,7 +149,7 @@
         }
     },
     "variables": {
-        "baseUrl": "https://raw.githubusercontent.com/sophos-iaas/xg-azure/master",
+        "baseUrl": "https://raw.githubusercontent.com/sophos-iaas/xg-azure/master/shared",
         "publicIpTemplate": "[concat(variables('baseUrl'),'/publicip-',parameters('publicIpNewOrExisting'),'.json')]",
         "netTemplate": "[concat(variables('baseUrl'),'/vnet-',parameters('netNewOrExisting'),'.json')]",
         "location": "[resourceGroup().location]",

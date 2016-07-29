@@ -1,10 +1,6 @@
 The MIT License (MIT)
 
-Copyright © 2016 Sophos Limited. All rights reserved.
-
-Sophos is a registered trademark of Sophos Limited and Sophos Group. All other
-product and company names mentioned are trademarks or registered trademarks of
-their respective owners.
+Copyright (c) 2015 Microsoft Azure
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23,3 +19,4 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
