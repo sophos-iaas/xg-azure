@@ -2,6 +2,13 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
+        "baseUrl": {
+            "type": "string",
+            "defaultValue": "https://raw.githubusercontent.com/sophos-iaas/xg-azure/master/shared",
+            "metadata": {
+                "artifactsBaseUrl": "Base URL of the template package"
+            }
+        },
         "vmName": {
             "type": "string",
             "defaultValue": "XG-Firewall",
@@ -149,9 +156,8 @@
         }
     },
     "variables": {
-        "baseUrl": "https://raw.githubusercontent.com/sophos-iaas/xg-azure/master/shared",
-        "publicIpTemplate": "[concat(variables('baseUrl'),'/publicip-',parameters('publicIpNewOrExisting'),'.json')]",
-        "netTemplate": "[concat(variables('baseUrl'),'/vnet-',parameters('netNewOrExisting'),'.json')]",
+        "publicIpTemplate": "[concat(parameters('baseUrl'),'/publicip-',parameters('publicIpNewOrExisting'),'.json')]",
+        "netTemplate": "[concat(parameters('baseUrl'),'/vnet-',parameters('netNewOrExisting'),'.json')]",
         "location": "[resourceGroup().location]",
         "group": "[resourceGroup().name]",
         "vhdContainer": "vhds",
