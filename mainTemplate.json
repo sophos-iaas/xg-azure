@@ -155,8 +155,8 @@
         "location": "[resourceGroup().location]",
         "group": "[resourceGroup().name]",
         "vhdContainer": "vhds",
-        "nicName": "PortB",
-        "nicName2": "PortA",
+        "nicWan": "PortB",
+        "nicLan": "PortA",
         "networkSecurityGroupName": "SecurityGroup",
         "routeTableName": "RouteTable",
         "pipType": "Dynamic",
@@ -294,7 +294,7 @@
             "location": "[resourceGroup().location]",
             "dependsOn": [
                 "[concat('Microsoft.Resources/deployments/', 'SettingUpVirtualNetwork')]",
-                "[concat('Microsoft.Network/networkInterfaces/', variables('nicName2'))]"
+                "[concat('Microsoft.Network/networkInterfaces/', variables('nicLan'))]"
             ],
             "properties": {
                 "routes": [
@@ -303,7 +303,7 @@
                         "properties": {
                             "addressPrefix": "0.0.0.0/0",
                             "nextHopType": "VirtualAppliance",
-                            "nextHopIpAddress": "[reference(resourceId('Microsoft.Network/networkInterfaces',variables('nicName2'))).ipConfigurations[0].properties.privateIPAddress]"
+                            "nextHopIpAddress": "[reference(resourceId('Microsoft.Network/networkInterfaces',variables('nicLan'))).ipConfigurations[0].properties.privateIPAddress]"
                         }
                     }
                 ]
@@ -312,7 +312,7 @@
         {
             "apiVersion": "[variables('apiVersion').network]",
             "type": "Microsoft.Network/networkInterfaces",
-            "name": "[variables('nicName')]",
+            "name": "[variables('nicWan')]",
             "location": "[variables('location')]",
             "dependsOn": [
                 "[concat('Microsoft.Resources/deployments/', 'SettingUpPublicIP')]",
@@ -343,7 +343,7 @@
         {
             "apiVersion": "[variables('apiVersion').network]",
             "type": "Microsoft.Network/networkInterfaces",
-            "name": "[variables('nicName2')]",
+            "name": "[variables('nicLan')]",
             "location": "[variables('location')]",
             "dependsOn": [
                 "[concat('Microsoft.Resources/deployments/', 'SettingUpVirtualNetwork')]"
@@ -374,8 +374,8 @@
             },
             "location": "[variables('location')]",
             "dependsOn": [
-                "[concat('Microsoft.Network/networkInterfaces/', variables('nicName'))]",
-                "[concat('Microsoft.Network/networkInterfaces/', variables('nicName2'))]",
+                "[concat('Microsoft.Network/networkInterfaces/', variables('nicWan'))]",
+                "[concat('Microsoft.Network/networkInterfaces/', variables('nicLan'))]",
                 "[concat('Microsoft.Storage/storageAccounts/', parameters('storageName'))]"
             ],
             "properties": {
@@ -416,13 +416,13 @@
                 "networkProfile": {
                     "networkInterfaces": [
                         {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName'))]",
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicWan'))]",
                             "properties": {
                                 "primary": true
                             }
                         },
                         {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName2'))]",
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicLan'))]",
                             "properties": {
                                 "primary": false
                             }
