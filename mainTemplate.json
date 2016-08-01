@@ -164,7 +164,6 @@
         "nicWan": "PortB",
         "nicLan": "PortA",
         "networkSecurityGroupName": "SecurityGroup",
-        "routeTableName": "RouteTable",
         "publicIpType": "Dynamic",
         "adminUsername": "azureuser",
         "sshKeyPath": "[concat('/home/',variables('adminUsername'),'/.ssh/authorized_keys')]",
@@ -291,28 +290,6 @@
                         "value": "[parameters('netRG')]"
                     }
                 }
-            }
-        },
-        {
-            "type": "Microsoft.Network/routeTables",
-            "name": "[variables('routeTableName')]",
-            "apiVersion": "[variables('apiVersion').network]",
-            "location": "[resourceGroup().location]",
-            "dependsOn": [
-                "[concat('Microsoft.Resources/deployments/', 'SettingUpVirtualNetwork')]",
-                "[concat('Microsoft.Network/networkInterfaces/', variables('nicLan'))]"
-            ],
-            "properties": {
-                "routes": [
-                    {
-                        "name": "DefaultViaXG",
-                        "properties": {
-                            "addressPrefix": "0.0.0.0/0",
-                            "nextHopType": "VirtualAppliance",
-                            "nextHopIpAddress": "[reference(resourceId('Microsoft.Network/networkInterfaces',variables('nicLan'))).ipConfigurations[0].properties.privateIPAddress]"
-                        }
-                    }
-                ]
             }
         },
         {
