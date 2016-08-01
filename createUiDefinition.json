@@ -177,16 +177,21 @@
             "vmName": "[basics('vmName')]",
             "adminPassword": "[basics('password').password]",
             "vmSize": "[steps('instanceDetails').vmSize]",
+            "netNewOrExisting": "[steps('instanceDetails').vnetSpec.newOrExisting]",
+            "netRG": "[steps('instanceDetails').vnetSpec.resourceGroup]",
             "netName": "[steps('instanceDetails').vnetSpec.name]",
             "netPrefix": "[steps('instanceDetails').vnetSpec.addressPrefix]",
             "wanName": "[steps('instanceDetails').vnetSpec.subnets.subnet1.name]",
             "wanPrefix": "[steps('instanceDetails').vnetSpec.subnets.subnet1.addressPrefix]",
             "lanName": "[steps('instanceDetails').vnetSpec.subnets.subnet2.name]",
             "lanPrefix": "[steps('instanceDetails').vnetSpec.subnets.subnet2.addressPrefix]",
-            "domainNameLabel": "[steps('instanceDetails').domainSpec.domainNameLabel]",
             "storageName": "[steps('instanceDetails').storageSpec.name]",
             "storageType": "[steps('instanceDetails').storageSpec.type]",
-            "imageSku": "[steps('instanceDetails').license]"
+            "imageSku": "[steps('instanceDetails').license]",
+            "publicIpDNS": "[steps('instanceDetails').domainSpec.domainNameLabel]",
+            "publicIpName": "[steps('instanceDetails').domainSpec.name]",
+            "publicIpNewOrExisting": "[steps('instanceDetails').domainSpec.newOrExistingOrNone]",
+            "publicIpRG": "[steps('instanceDetails').domainSpec.resourceGroup]"
         }
     }
 }
