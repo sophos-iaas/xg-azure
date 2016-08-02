@@ -168,6 +168,13 @@
                         "toolTip": "Storage account to be used for disk blobs and disgnostics. <b>Currently only new storage accounts are supported.</b>",
                         "defaultValue": {
                             "type": "Standard_LRS"
+                        },
+                        "constraints": {
+                            "allowedTypes": [
+                                "Standard_LRS",
+                                "Standard_ZRS",
+                                "Standard_GRS"
+                            ]
                         }
                     }
                 ]
