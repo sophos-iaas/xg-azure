@@ -4,7 +4,7 @@
     "parameters": {
         "baseUrl": {
             "type": "string",
-            "defaultValue": "https://raw.githubusercontent.com/sophos-iaas/xg-azure/master/shared",
+            "defaultValue": "https://raw.githubusercontent.com/sophos-iaas/xg-azure/master",
             "metadata": {
                 "artifactsBaseUrl": "Base URL of the template package"
             }
@@ -156,8 +156,8 @@
         }
     },
     "variables": {
-        "publicIpTemplate": "[concat(parameters('baseUrl'),'/publicip-',parameters('publicIpNewOrExisting'),'.json')]",
-        "netTemplate": "[concat(parameters('baseUrl'),'/vnet-',parameters('netNewOrExisting'),'.json')]",
+        "publicIpTemplate": "[concat(parameters('baseUrl'),'/shared/publicip-',parameters('publicIpNewOrExisting'),'.json')]",
+        "netTemplate": "[concat(parameters('baseUrl'),'/shared/vnet-',parameters('netNewOrExisting'),'.json')]",
         "location": "[resourceGroup().location]",
         "group": "[resourceGroup().name]",
         "vhdContainer": "vhds",
