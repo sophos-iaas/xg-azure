@@ -165,7 +165,7 @@
                         "name": "storageSpec",
                         "type": "Microsoft.Storage.StorageAccountSelector",
                         "label": "Storage Account",
-                        "toolTip": "Storage account to be used for disk blobs and disgnostics. <b>Currently only new storage accounts are supported.</b>",
+                        "toolTip": "Storage account to be used for disk blobs and diagnostics. <b>Currently only new storage accounts are supported.</b>",
                         "defaultValue": {
                             "type": "Standard_LRS"
                         },
