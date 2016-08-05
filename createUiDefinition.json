@@ -99,8 +99,8 @@
                             "subnets": "Subnets"
                         },
                         "toolTip": {
-                            "virtualNetwork": "Virtual Network the instance will be placed in. <b>Currently only new virtual networks are supported.</b>",
-                            "subnets": "Subnet definitons for WAN and LAN zone. <b>Currently only new subnet definitons are supported.</b>"
+                            "virtualNetwork": "Virtual Network the instance will be placed in.",
+                            "subnets": "Subnet definitons for WAN and LAN zone."
                         },
                         "defaultValue": {
                             "name": "VNET",
@@ -144,7 +144,7 @@
                             "domainNameLabel": "Domain name"
                         },
                         "toolTip": {
-                            "publicIpAddress": "Name of Public IP. <b>Currently only new Public IPs are supported.</b>",
+                            "publicIpAddress": "Name of Public IP.",
                             "domainNameLabel": "Your instance will be accessible from this domain"
                         },
                         "defaultValue": {
