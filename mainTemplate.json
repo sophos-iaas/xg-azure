@@ -47,7 +47,7 @@
                 "existing"
             ],
             "metadata": {
-                "description": "Create new Virtual Network or us an existing one."
+                "description": "Create new Virtual Network or use an existing one."
             }
         },
         "netRG": {
@@ -107,7 +107,7 @@
                 "existing"
             ],
             "metadata": {
-                "description": "Create new Public IP or us an existing one."
+                "description": "Create new Public IP or use an existing one."
             }
         },
         "publicIpRG": {
@@ -128,6 +128,24 @@
             "type": "string",
             "metadata": {
                 "description": "Unique DNS name prefix for Public IP."
+            }
+        },
+        "storageNewOrExisting": {
+            "type": "string",
+            "defaultValue": "new",
+            "allowedValues": [
+                "new",
+                "existing"
+            ],
+            "metadata": {
+                "description": "Create new Storage Account or use an existing one."
+            }
+        },
+        "storageRG": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Resource Group of existing Storage Account (optional)."
             }
         },
         "storageName": {
@@ -158,6 +176,7 @@
     "variables": {
         "publicIpTemplate": "[concat(parameters('baseUrl'),'/shared/publicip-',parameters('publicIpNewOrExisting'),'.json')]",
         "netTemplate": "[concat(parameters('baseUrl'),'/shared/vnet-',parameters('netNewOrExisting'),'.json')]",
+        "storageTemplate": "[concat(parameters('baseUrl'),'/shared/storageAccount-',parameters('storageNewOrExisting'),'.json')]",
         "location": "[resourceGroup().location]",
         "group": "[resourceGroup().name]",
         "vhdContainer": "vhds",
@@ -180,17 +199,27 @@
     },
     "resources": [
         {
-            "type": "Microsoft.Storage/storageAccounts",
-            "name": "[toLower(parameters('storageName'))]",
-            "apiVersion": "[variables('apiVersion').storage]",
-            "location": "[variables('location')]",
+            "name": "SettingUpStorageAccount",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "[variables('apiVersion').resources.deployments]",
             "properties": {
-
-            },
-            "sku": {
-                "name": "[parameters('storageType')]"
-            },
-            "kind": "Storage"
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('storageTemplate')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "storageAccountName": {
+                        "value": "[parameters('storageName')]"
+                    },
+                    "storageAccountType": {
+                        "value": "[parameters('storageType')]"
+                    },
+                    "storageAccountExistingRG": {
+                        "value": "[parameters('storageRG')]"
+                    }
+                }
+            }
         },
         {
             "apiVersion": "[variables('apiVersion').network]",
@@ -359,7 +388,7 @@
             "dependsOn": [
                 "[concat('Microsoft.Network/networkInterfaces/', variables('nicWan'))]",
                 "[concat('Microsoft.Network/networkInterfaces/', variables('nicLan'))]",
-                "[concat('Microsoft.Storage/storageAccounts/', parameters('storageName'))]"
+                "[concat('Microsoft.Resources/deployments/', 'SettingUpStorageAccount')]"
             ],
             "properties": {
                 "hardwareProfile": {
