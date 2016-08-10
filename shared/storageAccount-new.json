@@ -10,9 +10,6 @@
     },
     "storageAccountType": {
       "type": "string",
-      "allowedValues": [
-        "Standard_LRS"
-      ],
       "metadata": {
         "Description": "The type of the Storage Account created"
       },
@@ -30,11 +27,14 @@
     {
       "type": "Microsoft.Storage/storageAccounts",
       "name": "[concat(parameters('storageAccountName'))]",
-      "apiVersion": "2015-06-15",
+      "apiVersion": "2016-01-01",
       "location": "[resourceGroup().location]",
       "properties": {
-        "accountType": "[parameters('storageAccountType')]"
-      }
+      },
+      "sku": {
+          "name": "[parameters('storageAccountType')]"
+      },
+      "kind": "Storage"
     }
   ],
   "outputs": {
