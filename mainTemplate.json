@@ -195,7 +195,7 @@
             "compute": "2016-03-30"
         },
         "imagePublisher": "sophos",
-        "imageOffer": "sophos-xg-firewall-preview"
+        "imageOffer": "sophos-xg"
     },
     "resources": [
         {
