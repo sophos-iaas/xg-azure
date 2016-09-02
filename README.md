@@ -4,6 +4,16 @@ Deployment template to deploy Sophos XG to Azure
 Deploying
 =========
 
+Deployment via Marketplace
+--------------------------
+
+1) Got to Azure Marketplace and search for 'Sophos'
+
+2) Select the "'Sophos XG Firewall (Public Preview)' offer and follow the deployment wizard
+
+Deployment via template
+-----------------------
+
 1) Press the button and enter your Azure credentials when prompted.
 
 <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fsophos-iaas%2Fxg-azure%2Fmaster%2FmainTemplate.json" target="_blank">
@@ -18,14 +28,17 @@ Deploying
 
 4) Wait until the deployment goes to state "Succeeded"
 
-5) Connect to the machine
+***
+
+Connect to the VM instance
+==========================
 
 [https://full-dns-name:4444](https://full-dns-name:4444)
 
 ***
 
-Device Registration
-===================
+Registration
+============
 
 1) Get a demo license
 <a href="https://secure2.sophos.com/en-us/products/next-gen-firewall/free-trial.aspx">Sophos - Free Trial</a>
