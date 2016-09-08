@@ -25,7 +25,7 @@
                 },
                 "toolTip": {
                     "authenticationType": "",
-                    "password": "When connection to the instance via WebUI or ssh, use the password specified here.",
+                    "password": "When connecting to the instance via WebUI or ssh, use the password specified here.",
                     "sshPublicKey": ""
                 },
                 "constraints": {
@@ -172,7 +172,6 @@
                         "constraints": {
                             "allowedTypes": [
                                 "Standard_LRS",
-                                "Standard_ZRS",
                                 "Standard_GRS"
                             ]
                         }
