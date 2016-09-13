@@ -16,25 +16,20 @@
             },
             {
                 "name": "password",
-                "type": "Microsoft.Compute.CredentialsCombo",
+                "type": "Microsoft.Common.PasswordBox",
                 "label": {
-                    "authenticationType": "Authentication type",
-                    "password": "Password for admin user",
-                    "confirmPassword": "Confirm password",
-                    "sshPublicKey": "SSH public key"
+                    "password": "Password",
+                    "confirmPassword": "Confirm password"
                 },
-                "toolTip": {
-                    "authenticationType": "",
-                    "password": "When connecting to the instance via WebUI or ssh, use the password specified here.",
-                    "sshPublicKey": ""
-                },
+                "toolTip": "Password for admin user",
                 "constraints": {
-                    "required": true
+                    "required": true,
+                    "regex": "^((?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])|(?=.*[0-9])(?=.*[a-z])(?=.*[!@#$%^&*])|(?=.*[0-9])(?=.*[A-Z])(?=.*[!@#$%^&*])|(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*])).{6,72}$",
+                    "validationMessage": "Password must be at least 6 characters long and have 3 out of the following: one number, one lower case, one upper case, or one special character"
                 },
                 "options": {
                     "hideConfirmation": false
-                },
-                "osPlatform": "Windows"
+                }
             }
         ],
         "steps": [
@@ -181,7 +176,7 @@
         ],
         "outputs": {
             "vmName": "[basics('vmName')]",
-            "adminPassword": "[basics('password').password]",
+            "adminPassword": "[basics('password')]",
             "vmSize": "[steps('instanceDetails').vmSize]",
             "netNewOrExisting": "[steps('instanceDetails').vnetSpec.newOrExisting]",
             "netRG": "[steps('instanceDetails').vnetSpec.resourceGroup]",
