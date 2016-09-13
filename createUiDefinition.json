@@ -24,8 +24,8 @@
                 "toolTip": "Password for admin user",
                 "constraints": {
                     "required": true,
-                    "regex": "^((?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])|(?=.*[0-9])(?=.*[a-z])(?=.*[!@#$%^&*])|(?=.*[0-9])(?=.*[A-Z])(?=.*[!@#$%^&*])|(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*])).{6,72}$",
-                    "validationMessage": "Password must be at least 6 characters long and have 3 out of the following: one number, one lower case, one upper case, or one special character"
+                    "regex": "^(?:(?=.*[a-z])(?:(?=.*[A-Z])(?=.*[\\d\\W])|(?=.*\\W)(?=.*\\d))|(?=.*\\W)(?=.*[A-Z])(?=.*\\d)).{12,72}$",
+                    "validationMessage": "Your password should be at least 12 characters long and have at least 3 of the following: 1 lower case character, 1 upper case character, 1 number and 1 special character"
                 },
                 "options": {
                     "hideConfirmation": false
