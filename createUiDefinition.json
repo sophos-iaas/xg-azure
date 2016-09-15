@@ -46,14 +46,10 @@
                         "name": "license",
                         "type": "Microsoft.Common.OptionsGroup",
                         "label": "License Type",
-                        "defaultValue": "PAYG",
+                        "defaultValue": "BYOL",
                         "toolTip": "Choose to either pay hourly (PAYG) or buy a license from Sophos (BYOL)",
                         "constraints": {
                             "allowedValues": [
-                                {
-                                    "label": "PAYG",
-                                    "value": "payg"
-                                },
                                 {
                                     "label": "BYOL",
                                     "value": "byol"
