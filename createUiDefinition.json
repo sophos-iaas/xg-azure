@@ -69,6 +69,7 @@
                         "constraints": {
                             "allowedSizes": [
                                 "Standard_D3",
+                                "Standard_D3_v2",
                                 "Standard_A3",
                                 "Standard_G3",
                                 "Standard_GS3"
