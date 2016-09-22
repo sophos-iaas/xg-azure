@@ -26,8 +26,7 @@
             "type": "string",
             "defaultValue": "byol",
             "allowedValues": [
-                "byol",
-                "payg"
+                "byol"
             ],
             "metadata": {
                 "description": "License type to use."
