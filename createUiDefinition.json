@@ -16,25 +16,20 @@
             },
             {
                 "name": "password",
-                "type": "Microsoft.Compute.CredentialsCombo",
+                "type": "Microsoft.Common.PasswordBox",
                 "label": {
-                    "authenticationType": "Authentication type",
-                    "password": "Password for admin user",
-                    "confirmPassword": "Confirm password",
-                    "sshPublicKey": "SSH public key"
+                    "password": "Password",
+                    "confirmPassword": "Confirm password"
                 },
-                "toolTip": {
-                    "authenticationType": "",
-                    "password": "When connection to the instance via WebUI or ssh, use the password specified here.",
-                    "sshPublicKey": ""
-                },
+                "toolTip": "Password for admin user",
                 "constraints": {
-                    "required": true
+                    "required": true,
+                    "regex": "^(?:(?=.*[a-z])(?:(?=.*[A-Z])(?=.*[\\d\\W])|(?=.*\\W)(?=.*\\d))|(?=.*\\W)(?=.*[A-Z])(?=.*\\d)).{12,72}$",
+                    "validationMessage": "Your password should be at least 12 characters long and have at least 3 of the following: 1 lower case character, 1 upper case character, 1 number and 1 special character"
                 },
                 "options": {
                     "hideConfirmation": false
-                },
-                "osPlatform": "Windows"
+                }
             }
         ],
         "steps": [
@@ -51,14 +46,10 @@
                         "name": "license",
                         "type": "Microsoft.Common.OptionsGroup",
                         "label": "License Type",
-                        "defaultValue": "PAYG",
+                        "defaultValue": "BYOL",
                         "toolTip": "Choose to either pay hourly (PAYG) or buy a license from Sophos (BYOL)",
                         "constraints": {
                             "allowedValues": [
-                                {
-                                    "label": "PAYG",
-                                    "value": "payg"
-                                },
                                 {
                                     "label": "BYOL",
                                     "value": "byol"
@@ -172,7 +163,6 @@
                         "constraints": {
                             "allowedTypes": [
                                 "Standard_LRS",
-                                "Standard_ZRS",
                                 "Standard_GRS"
                             ]
                         }
@@ -182,7 +172,7 @@
         ],
         "outputs": {
             "vmName": "[basics('vmName')]",
-            "adminPassword": "[basics('password').password]",
+            "adminPassword": "[basics('password')]",
             "vmSize": "[steps('instanceDetails').vmSize]",
             "netNewOrExisting": "[steps('instanceDetails').vnetSpec.newOrExisting]",
             "netRG": "[steps('instanceDetails').vnetSpec.resourceGroup]",

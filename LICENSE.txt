@@ -1,6 +1,4 @@
-The MIT License (MIT)
-
-Copyright © 2016 Sophos Limited. All rights reserved.
+Copyright 2016 Sophos Limited. All rights reserved.
 
 Sophos is a registered trademark of Sophos Limited and Sophos Group. All other
 product and company names mentioned are trademarks or registered trademarks of

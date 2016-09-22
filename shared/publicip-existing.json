@@ -25,7 +25,7 @@
       "type": "string"
     },
     "fqdn": {
-      "value": "[reference(variables('publicIpId'),providers('Microsoft.Network', 'publicIPAddresses').apiVersions[0]).dnsSettings.fqdn]",
+      "value": "[reference(variables('publicIpId'),'2016-06-01').dnsSettings.fqdn]",
       "type": "string"
     }
   }
