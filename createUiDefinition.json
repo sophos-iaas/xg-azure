@@ -78,7 +78,7 @@
                         "osPlatform": "Linux",
                         "imageReference": {
                             "publisher": "sophos",
-                            "offer": "sophos-xg-firewall-preview",
+                            "offer": "sophos-xg",
                             "sku": "[steps('instanceDetails').license]"
                         },
                         "count": "1"
