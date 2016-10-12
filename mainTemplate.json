@@ -200,6 +200,13 @@
             "metadata": {
                 "description": "Name of the Security Group"
             }
+        },
+        "availabilitySetName": {
+            "type": "string",
+            "defaultValue": "AvailabilitySet",
+            "metadata": {
+                "description": "Name of the Availability Set"
+            }
         }
     },
     "variables": {
@@ -223,6 +230,15 @@
         "imageOffer": "sophos-xg"
     },
     "resources": [
+        {
+            "type": "Microsoft.Compute/availabilitySets",
+            "name": "[parameters('availabilitySetName')]",
+            "apiVersion": "[variables('apiVersion').compute]",
+            "location": "[parameters('location')]",
+            "properties": {
+
+            }
+        },
         {
             "name": "SettingUpStorageAccount",
             "type": "Microsoft.Resources/deployments",
@@ -414,8 +430,12 @@
                 "[concat('Microsoft.Network/networkInterfaces/', parameters('nicWan'))]",
                 "[concat('Microsoft.Network/networkInterfaces/', parameters('nicLan'))]",
                 "[concat('Microsoft.Resources/deployments/', 'SettingUpStorageAccount')]",
+                "[concat('Microsoft.Compute/availabilitySets/',parameters('availabilitySetName'))]"
             ],
             "properties": {
+                "availabilitySet": {
+                    "id": "[resourceId('Microsoft.Compute/availabilitySets', parameters('availabilitySetName'))]"
+                },
                 "hardwareProfile": {
                     "vmSize": "[parameters('vmSize')]"
                 },
