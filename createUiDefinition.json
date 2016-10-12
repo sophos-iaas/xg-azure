@@ -53,6 +53,10 @@
                                 {
                                     "label": "BYOL",
                                     "value": "byol"
+                                },
+                                {
+                                    "label": "PAYG",
+                                    "value": "payg"
                                 }
                             ]
                         }
