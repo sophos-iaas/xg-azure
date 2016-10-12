@@ -179,6 +179,27 @@
             "metadata": {
                 "description": "Geo-Location you want to deploy to."
             }
+        },
+        "nicWan": {
+            "type": "string",
+            "defaultValue": "PortA",
+            "metadata": {
+                "description": "Network Interface Name for WAN Zone"
+            }
+        },
+        "nicLan": {
+            "type": "string",
+            "defaultValue": "PortB",
+            "metadata": {
+                "description": "Network Interface Name for LAN Zone"
+            }
+        },
+        "networkSecurityGroupName": {
+            "type": "string",
+            "defaultValue": "SecurityGroup",
+            "metadata": {
+                "description": "Name of the Security Group"
+            }
         }
     },
     "variables": {
@@ -187,9 +208,6 @@
         "storageTemplate": "[concat(parameters('baseUrl'),'/shared/storageAccount-',parameters('storageNewOrExisting'),'.json')]",
         "group": "[resourceGroup().name]",
         "vhdContainer": "vhds",
-        "nicWan": "PortB",
-        "nicLan": "PortA",
-        "networkSecurityGroupName": "SecurityGroup",
         "publicIpType": "Dynamic",
         "adminUsername": "azureuser",
         "sshKeyPath": "[concat('/home/',variables('adminUsername'),'/.ssh/authorized_keys')]",
@@ -231,7 +249,7 @@
         {
             "apiVersion": "[variables('apiVersion').network]",
             "type": "Microsoft.Network/networkSecurityGroups",
-            "name": "[variables('networkSecurityGroupName')]",
+            "name": "[parameters('networkSecurityGroupName')]",
             "location": "[parameters('location')]",
             "tags": {
                 "displayName": "NetworkSecurityGroup"
@@ -331,16 +349,16 @@
         {
             "apiVersion": "[variables('apiVersion').network]",
             "type": "Microsoft.Network/networkInterfaces",
-            "name": "[variables('nicWan')]",
+            "name": "[parameters('nicWan')]",
             "location": "[parameters('location')]",
             "dependsOn": [
                 "[concat('Microsoft.Resources/deployments/', 'SettingUpPublicIP')]",
                 "[concat('Microsoft.Resources/deployments/', 'SettingUpVirtualNetwork')]",
-                "[concat('Microsoft.Network/networkSecurityGroups/', variables('networkSecurityGroupName'))]"
+                "[concat('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupName'))]"
             ],
             "properties": {
                 "networkSecurityGroup": {
-                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]"
+                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]"
                 },
                 "ipConfigurations": [
                     {
@@ -362,7 +380,7 @@
         {
             "apiVersion": "[variables('apiVersion').network]",
             "type": "Microsoft.Network/networkInterfaces",
-            "name": "[variables('nicLan')]",
+            "name": "[parameters('nicLan')]",
             "location": "[parameters('location')]",
             "dependsOn": [
                 "[concat('Microsoft.Resources/deployments/', 'SettingUpVirtualNetwork')]"
@@ -393,9 +411,9 @@
             },
             "location": "[parameters('location')]",
             "dependsOn": [
-                "[concat('Microsoft.Network/networkInterfaces/', variables('nicWan'))]",
-                "[concat('Microsoft.Network/networkInterfaces/', variables('nicLan'))]",
-                "[concat('Microsoft.Resources/deployments/', 'SettingUpStorageAccount')]"
+                "[concat('Microsoft.Network/networkInterfaces/', parameters('nicWan'))]",
+                "[concat('Microsoft.Network/networkInterfaces/', parameters('nicLan'))]",
+                "[concat('Microsoft.Resources/deployments/', 'SettingUpStorageAccount')]",
             ],
             "properties": {
                 "hardwareProfile": {
@@ -435,13 +453,13 @@
                 "networkProfile": {
                     "networkInterfaces": [
                         {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicWan'))]",
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',parameters('nicWan'))]",
                             "properties": {
                                 "primary": true
                             }
                         },
                         {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicLan'))]",
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',parameters('nicLan'))]",
                             "properties": {
                                 "primary": false
                             }
