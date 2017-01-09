@@ -9,7 +9,7 @@ Deployment via Marketplace
 
 1) Got to Azure Marketplace and search for 'Sophos': https://azure.microsoft.com/marketplace/?term=Sophos
 
-2) Select the "'Sophos XG Firewall (Public Preview)' offer and follow the deployment wizard.
+2) Select the "'Sophos XG Firewall' offer and follow the deployment wizard.
 
 Deployment via template
 -----------------------
@@ -26,7 +26,6 @@ Deployment via template
 
 Please note:
 * The `adminPassword` has to be minimum 8 characters, **containing at least a lowercase letter, an uppercase letter, a number, and a special character.**
-* During the Public Preview only **BYOL** licenses are supported.
 
 3) Deployment will start.
 
@@ -58,15 +57,6 @@ Device Setup
 ============
 
 Either choose to run the Basic Setup wizard, or skip it and start to configure the device instantly.
-
-***
-
-UI Preview
-==========
-This will not start a deployment yet.
-
-<a href="https://portal.azure.com/#blade/Microsoft_Azure_Compute/CreateMultiVmWizardBlade/internal_bladeCallId/anything/internal_bladeCallerParams/{&quot;initialData&quot;:{},&quot;providerConfig&quot;:{&quot;createUiDefinition&quot;:&quot;https%3A%2F%2Fraw.githubusercontent.com%2Fsophos-iaas%2Fxg-azure%2Fmaster%2FcreateUiDefinition.json
-&quot;}}">[Preview createUiDefinition.json]</a>
 
 ***
 
