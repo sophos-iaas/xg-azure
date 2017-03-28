@@ -182,14 +182,14 @@
         },
         "nicWan": {
             "type": "string",
-            "defaultValue": "PortA",
+            "defaultValue": "PortB",
             "metadata": {
                 "description": "Network Interface Name for WAN Zone"
             }
         },
         "nicLan": {
             "type": "string",
-            "defaultValue": "PortB",
+            "defaultValue": "PortA",
             "metadata": {
                 "description": "Network Interface Name for LAN Zone"
             }
