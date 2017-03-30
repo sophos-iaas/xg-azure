@@ -44,10 +44,6 @@
                             "value": "blob.core.windows.net"
                         },
                         {
-                            "label": "Azure China",
-                            "value": "blob.core.chinacloudapi.cn"
-                        },
-                        {
                             "label": "Azure Germany",
                             "value": "blob.core.cloudapi.de"
                         },
