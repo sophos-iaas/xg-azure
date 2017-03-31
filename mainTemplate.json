@@ -167,7 +167,10 @@
             "defaultValue": "blob.core.windows.net",
             "allowedValues": [
                 "blob.azurestack.local",
-                "blob.core.windows.net"
+                "blob.core.windows.net",
+                "blob.core.usgovcloudapi.net",
+                "blob.core.chinacloudapi.cn",
+                "blob.core.cloudapi.de"
             ],
             "metadata": {
                 "description": "Endpoint for Storage Account."

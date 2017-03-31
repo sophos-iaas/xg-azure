@@ -30,6 +30,33 @@
                 "options": {
                     "hideConfirmation": false
                 }
+            },
+            {
+                "name": "cloud",
+                "type": "Microsoft.Common.DropDown",
+                "label": "Cloud",
+                "defaultValue": "Azure",
+                "toolTip": "Choose which cloud to deploy to",
+                "constraints": {
+                    "allowedValues": [
+                        {
+                            "label": "Azure",
+                            "value": "blob.core.windows.net"
+                        },
+                        {
+                            "label": "Azure Germany",
+                            "value": "blob.core.cloudapi.de"
+                        },
+                        {
+                            "label": "Azure Government",
+                            "value": "blob.core.usgovcloudapi.net"
+                        },
+                        {
+                            "label": "Azure Stack",
+                            "value": "blob.azurestack.local"
+                        }
+                    ]
+                }
             }
         ],
         "steps": [
@@ -202,7 +229,8 @@
             "publicIpName": "[steps('instanceDetails').domainSpec.name]",
             "publicIpNewOrExisting": "[steps('instanceDetails').domainSpec.newOrExistingOrNone]",
             "publicIpRG": "[steps('instanceDetails').domainSpec.resourceGroup]",
-            "location": "[location()]"
+            "location": "[location()]",
+            "storageEndpoint": "[basics('cloud')]"
         }
     }
 }
