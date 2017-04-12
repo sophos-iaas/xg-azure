@@ -162,20 +162,6 @@
                 "description": "Replication mode for Storage Account."
             }
         },
-        "storageEndpoint": {
-            "type": "string",
-            "defaultValue": "blob.core.windows.net",
-            "allowedValues": [
-                "blob.azurestack.local",
-                "blob.core.windows.net",
-                "blob.core.usgovcloudapi.net",
-                "blob.core.chinacloudapi.cn",
-                "blob.core.cloudapi.de"
-            ],
-            "metadata": {
-                "description": "Endpoint for Storage Account."
-            }
-        },
         "location": {
             "type": "string",
             "defaultValue": "[resourceGroup().Location]",
@@ -460,7 +446,7 @@
                             "lun": 0,
                             "createOption": "FromImage",
                             "vhd": {
-                                "uri": "[concat('http://',parameters('storageName'),'.', parameters('storageEndpoint'), '/', variables('vhdContainer'),'/',parameters('vmName'),'-aux.vhd')]"
+                                "uri": "[concat(reference('SettingUpStorageAccount').outputs.storageAccountEndpoint.value, variables('vhdContainer'),'/',parameters('vmName'),'-aux.vhd')]"
                             }
                         }
                     ],
@@ -469,7 +455,7 @@
                         "caching": "ReadWrite",
                         "createOption": "FromImage",
                         "vhd": {
-                            "uri": "[concat('http://',parameters('storageName'),'.', parameters('storageEndpoint'), '/', variables('vhdContainer'),'/',parameters('vmName'),'-prim.vhd')]"
+                            "uri": "[concat(reference('SettingUpStorageAccount').outputs.storageAccountEndpoint.value, variables('vhdContainer'),'/',parameters('vmName'),'-prim.vhd')]"
                         }
                     }
                 },
@@ -492,7 +478,7 @@
                 "diagnosticsProfile": {
                     "bootDiagnostics": {
                         "enabled": "true",
-                        "storageUri": "[concat('http://',parameters('storageName'),'.', parameters('storageEndpoint'))]"
+                        "storageUri": "[reference('SettingUpStorageAccount').outputs.storageAccountEndpoint.value]"
                     }
                 }
             }
