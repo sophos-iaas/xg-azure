@@ -41,6 +41,10 @@
     "storageAccountId": {
       "value": "[resourceId('Microsoft.Storage/StorageAccounts',parameters('storageAccountName'))]",
       "type": "string"
+    },
+    "storageAccountEndpoint": {
+      "value": "[reference(concat('Microsoft.Storage/storageAccounts/', parameters('storageAccountName')), '2016-01-01').primaryEndpoints.blob]",
+      "type": "string"
     }
   }
 }
