@@ -7,17 +7,21 @@ Deploying
 Deployment via Marketplace
 --------------------------
 
-1) Got to Azure Marketplace and search for 'Sophos': https://azure.microsoft.com/marketplace/?term=Sophos
+1) Go to Azure Marketplace and search for 'Sophos': https://azure.microsoft.com/marketplace/?term=Sophos
 
 2) Select the "'Sophos XG Firewall' offer and follow the deployment wizard.
 
 Deployment via template
 -----------------------
 
-1) Press the button and enter your Azure credentials when prompted.
+1) Press the appropriate deployment button and enter your Azure credentials when prompted.
 
 <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fsophos-iaas%2Fxg-azure%2Fmaster%2FmainTemplate.json" target="_blank">
     <img src="http://azuredeploy.net/deploybutton.png"/>
+</a>
+
+<a href="https://portal.azure.us/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fsophos-iaas%2Fxg-azure%2Fmaster%2FmainTemplate.json" target="_blank">
+    <img src="https://azuredeploy.net/AzureGov.png"/>
 </a>
 
 2) Take a look on the example values for template parameters in `mainTemplateParameters.json`.
