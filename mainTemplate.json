@@ -190,6 +190,17 @@
                 "description": "Name of the Security Group"
             }
         },
+        "availabilitySetNewOrExisting": {
+            "type": "string",
+            "defaultValue": "new",
+            "allowedValues": [
+                "new",
+                "existing"
+            ],
+            "metadata": {
+                "description": "Create new Availability Set or use an existing one."
+            }
+        },
         "availabilitySetName": {
             "type": "string",
             "defaultValue": "AvailabilitySet",
@@ -202,7 +213,7 @@
         "publicIpTemplate": "[concat(parameters('baseUrl'),'/shared/publicip-',parameters('publicIpNewOrExisting'),'.json')]",
         "netTemplate": "[concat(parameters('baseUrl'),'/shared/vnet-',parameters('netNewOrExisting'),'.json')]",
         "storageTemplate": "[concat(parameters('baseUrl'),'/shared/storageAccount-',parameters('storageNewOrExisting'),'.json')]",
-        "group": "[resourceGroup().name]",
+        "availabilitySetTemplate": "[concat(parameters('baseUrl'),'/shared/availabilitySet-',parameters('availabilitySetNewOrExisting'),'.json')]",
         "vhdContainer": "vhds",
         "publicIpType": "Dynamic",
         "adminUsername": "azureuser",
@@ -220,12 +231,20 @@
     },
     "resources": [
         {
-            "type": "Microsoft.Compute/availabilitySets",
-            "name": "[parameters('availabilitySetName')]",
-            "apiVersion": "[variables('apiVersion').compute]",
-            "location": "[parameters('location')]",
+            "name": "SettingUpAvailabilitySet",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "[variables('apiVersion').resources.deployments]",
             "properties": {
-
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('availabilitySetTemplate')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "availabilitySetName": {
+                        "value": "[parameters('availabilitySetName')]"
+                    }
+                }
             }
         },
         {
@@ -419,11 +438,11 @@
                 "[concat('Microsoft.Network/networkInterfaces/', parameters('nicWan'))]",
                 "[concat('Microsoft.Network/networkInterfaces/', parameters('nicLan'))]",
                 "[concat('Microsoft.Resources/deployments/', 'SettingUpStorageAccount')]",
-                "[concat('Microsoft.Compute/availabilitySets/',parameters('availabilitySetName'))]"
+                "[concat('Microsoft.Resources/deployments/', 'SettingUpAvailabilitySet')]"
             ],
             "properties": {
                 "availabilitySet": {
-                    "id": "[resourceId('Microsoft.Compute/availabilitySets', parameters('availabilitySetName'))]"
+                    "id": "[reference('SettingUpAvailabilitySet').outputs.availabilitySetName.value]"
                 },
                 "hardwareProfile": {
                     "vmSize": "[parameters('vmSize')]"
