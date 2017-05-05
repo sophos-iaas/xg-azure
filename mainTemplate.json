@@ -183,12 +183,30 @@
                 "description": "Network Interface Name for LAN Zone"
             }
         },
+        "networkSecurityGroupNewOrExisting": {
+            "type": "string",
+            "defaultValue": "new",
+            "allowedValues": [
+                "new",
+                "existing"
+            ],
+            "metadata": {
+                "description": "Create new Network Security Group or use an existing one."
+            }
+        },
         "networkSecurityGroupName": {
             "type": "string",
             "defaultValue": "SecurityGroup",
             "metadata": {
-                "description": "Name of the Security Group"
+                "description": "Name of the Network Security Group"
             }
+        },
+        "trustedNetwork": {
+          "type": "string",
+          "defaultValue": "*",
+          "metadata": {
+              "description": "Trusted Network for Admin Access. * = all-in IDR = only letin"
+          }
         },
         "availabilitySetNewOrExisting": {
             "type": "string",
@@ -214,6 +232,7 @@
         "netTemplate": "[concat(parameters('baseUrl'),'/shared/vnet-',parameters('netNewOrExisting'),'.json')]",
         "storageTemplate": "[concat(parameters('baseUrl'),'/shared/storageAccount-',parameters('storageNewOrExisting'),'.json')]",
         "availabilitySetTemplate": "[concat(parameters('baseUrl'),'/shared/availabilitySet-',parameters('availabilitySetNewOrExisting'),'.json')]",
+        "networkSecurityGroupTemplate": "[concat(parameters('baseUrl'),'/shared/networkSecurityGroup-',parameters('networkSecurityGroupNewOrExisting'),'.json')]",
         "vhdContainer": "vhds",
         "publicIpType": "Dynamic",
         "adminUsername": "azureuser",
@@ -271,42 +290,23 @@
             }
         },
         {
-            "apiVersion": "[variables('apiVersion').network]",
-            "type": "Microsoft.Network/networkSecurityGroups",
-            "name": "[parameters('networkSecurityGroupName')]",
-            "location": "[parameters('location')]",
-            "tags": {
-                "displayName": "NetworkSecurityGroup"
-            },
+            "name": "SettingUpNetworkSecurityGroup",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "[variables('apiVersion').resources.deployments]",
             "properties": {
-                "securityRules": [
-                    {
-                        "name": "allow_webui",
-                        "properties": {
-                            "protocol": "tcp",
-                            "sourcePortRange": "*",
-                            "destinationPortRange": "4444",
-                            "sourceAddressPrefix": "*",
-                            "destinationAddressPrefix": "*",
-                            "access": "Allow",
-                            "priority": 101,
-                            "direction": "Inbound"
-                        }
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('networkSecurityGroupTemplate')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "networkSecurityGroupName": {
+                        "value": "[parameters('networkSecurityGroupName')]"
                     },
-                    {
-                        "name": "allow_ssh",
-                        "properties": {
-                            "protocol": "tcp",
-                            "sourcePortRange": "*",
-                            "destinationPortRange": "22",
-                            "sourceAddressPrefix": "*",
-                            "destinationAddressPrefix": "*",
-                            "access": "Allow",
-                            "priority": 102,
-                            "direction": "Inbound"
-                        }
+                    "trustedNetwork": {
+                        "value": "[parameters('trustedNetwork')]"
                     }
-                ]
+                }
             }
         },
         {
@@ -378,11 +378,11 @@
             "dependsOn": [
                 "[concat('Microsoft.Resources/deployments/', 'SettingUpPublicIP')]",
                 "[concat('Microsoft.Resources/deployments/', 'SettingUpVirtualNetwork')]",
-                "[concat('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupName'))]"
+                "[concat('Microsoft.Resources/deployments/', 'SettingUpNetworkSecurityGroup')]"
             ],
             "properties": {
                 "networkSecurityGroup": {
-                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]"
+                  "id": "[reference('SettingUpNetworkSecurityGroup','2015-01-01').outputs.networkSecurityGroupName.value]"
                 },
                 "ipConfigurations": [
                     {
