@@ -1,0 +1,56 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "networkSecurityGroupName": {
+      "type": "string"
+    },
+    "trustedNetwork": {
+      "type": "string"
+    }
+  },
+  "resources": [
+    {
+        "apiVersion": "2016-06-01",
+        "type": "Microsoft.Network/networkSecurityGroups",
+        "name": "[parameters('networkSecurityGroupName')]",
+        "location": "[resourceGroup().location]",
+        "properties": {
+            "securityRules": [
+                {
+                    "name": "allow_webui",
+                    "properties": {
+                        "protocol": "tcp",
+                        "sourcePortRange": "*",
+                        "destinationPortRange": "4444",
+                        "sourceAddressPrefix": "[parameters('trustedNetwork')]",
+                        "destinationAddressPrefix": "*",
+                        "access": "Allow",
+                        "priority": 101,
+                        "direction": "Inbound"
+                    }
+                },
+                {
+                    "name": "allow_ssh",
+                    "properties": {
+                        "protocol": "tcp",
+                        "sourcePortRange": "*",
+                        "destinationPortRange": "22",
+                        "sourceAddressPrefix": "[parameters('trustedNetwork')]",
+                        "destinationAddressPrefix": "*",
+                        "access": "Allow",
+                        "priority": 102,
+                        "direction": "Inbound"
+                    }
+                }
+            ]
+        }
+    }
+  ],
+  "outputs": {
+    "networkSecurityGroupName": {
+      "type": "string",
+      "value": "[resourceId('Microsoft.Compute/networkSecurityGroups',parameters('networkSecurityGroupName'))]"
+    }
+  }
+}

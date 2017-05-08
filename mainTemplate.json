@@ -183,11 +183,40 @@
                 "description": "Network Interface Name for LAN Zone"
             }
         },
+        "networkSecurityGroupNewOrExisting": {
+            "type": "string",
+            "defaultValue": "new",
+            "allowedValues": [
+                "new",
+                "existing"
+            ],
+            "metadata": {
+                "description": "Create new Network Security Group or use an existing one."
+            }
+        },
         "networkSecurityGroupName": {
             "type": "string",
             "defaultValue": "SecurityGroup",
             "metadata": {
-                "description": "Name of the Security Group"
+                "description": "Name of the Network Security Group"
+            }
+        },
+        "trustedNetwork": {
+          "type": "string",
+          "defaultValue": "*",
+          "metadata": {
+              "description": "Trusted network for admin access. Using * will allow traffic from everywhere; using a CIDR notation, e.g., 203.0.113.0/24, will only allow traffic from that network range."
+          }
+        },
+        "availabilitySetNewOrExisting": {
+            "type": "string",
+            "defaultValue": "new",
+            "allowedValues": [
+                "new",
+                "existing"
+            ],
+            "metadata": {
+                "description": "Create new Availability Set or use an existing one."
             }
         },
         "availabilitySetName": {
@@ -202,7 +231,8 @@
         "publicIpTemplate": "[concat(parameters('baseUrl'),'/shared/publicip-',parameters('publicIpNewOrExisting'),'.json')]",
         "netTemplate": "[concat(parameters('baseUrl'),'/shared/vnet-',parameters('netNewOrExisting'),'.json')]",
         "storageTemplate": "[concat(parameters('baseUrl'),'/shared/storageAccount-',parameters('storageNewOrExisting'),'.json')]",
-        "group": "[resourceGroup().name]",
+        "availabilitySetTemplate": "[concat(parameters('baseUrl'),'/shared/availabilitySet-',parameters('availabilitySetNewOrExisting'),'.json')]",
+        "networkSecurityGroupTemplate": "[concat(parameters('baseUrl'),'/shared/networkSecurityGroup-',parameters('networkSecurityGroupNewOrExisting'),'.json')]",
         "vhdContainer": "vhds",
         "publicIpType": "Dynamic",
         "adminUsername": "azureuser",
@@ -220,12 +250,20 @@
     },
     "resources": [
         {
-            "type": "Microsoft.Compute/availabilitySets",
-            "name": "[parameters('availabilitySetName')]",
-            "apiVersion": "[variables('apiVersion').compute]",
-            "location": "[parameters('location')]",
+            "name": "SettingUpAvailabilitySet",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "[variables('apiVersion').resources.deployments]",
             "properties": {
-
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('availabilitySetTemplate')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "availabilitySetName": {
+                        "value": "[parameters('availabilitySetName')]"
+                    }
+                }
             }
         },
         {
@@ -252,42 +290,23 @@
             }
         },
         {
-            "apiVersion": "[variables('apiVersion').network]",
-            "type": "Microsoft.Network/networkSecurityGroups",
-            "name": "[parameters('networkSecurityGroupName')]",
-            "location": "[parameters('location')]",
-            "tags": {
-                "displayName": "NetworkSecurityGroup"
-            },
+            "name": "SettingUpNetworkSecurityGroup",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "[variables('apiVersion').resources.deployments]",
             "properties": {
-                "securityRules": [
-                    {
-                        "name": "allow_webui",
-                        "properties": {
-                            "protocol": "tcp",
-                            "sourcePortRange": "*",
-                            "destinationPortRange": "4444",
-                            "sourceAddressPrefix": "*",
-                            "destinationAddressPrefix": "*",
-                            "access": "Allow",
-                            "priority": 101,
-                            "direction": "Inbound"
-                        }
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('networkSecurityGroupTemplate')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "networkSecurityGroupName": {
+                        "value": "[parameters('networkSecurityGroupName')]"
                     },
-                    {
-                        "name": "allow_ssh",
-                        "properties": {
-                            "protocol": "tcp",
-                            "sourcePortRange": "*",
-                            "destinationPortRange": "22",
-                            "sourceAddressPrefix": "*",
-                            "destinationAddressPrefix": "*",
-                            "access": "Allow",
-                            "priority": 102,
-                            "direction": "Inbound"
-                        }
+                    "trustedNetwork": {
+                        "value": "[parameters('trustedNetwork')]"
                     }
-                ]
+                }
             }
         },
         {
@@ -359,11 +378,11 @@
             "dependsOn": [
                 "[concat('Microsoft.Resources/deployments/', 'SettingUpPublicIP')]",
                 "[concat('Microsoft.Resources/deployments/', 'SettingUpVirtualNetwork')]",
-                "[concat('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupName'))]"
+                "[concat('Microsoft.Resources/deployments/', 'SettingUpNetworkSecurityGroup')]"
             ],
             "properties": {
                 "networkSecurityGroup": {
-                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]"
+                  "id": "[reference('SettingUpNetworkSecurityGroup','2015-01-01').outputs.networkSecurityGroupName.value]"
                 },
                 "ipConfigurations": [
                     {
@@ -419,11 +438,11 @@
                 "[concat('Microsoft.Network/networkInterfaces/', parameters('nicWan'))]",
                 "[concat('Microsoft.Network/networkInterfaces/', parameters('nicLan'))]",
                 "[concat('Microsoft.Resources/deployments/', 'SettingUpStorageAccount')]",
-                "[concat('Microsoft.Compute/availabilitySets/',parameters('availabilitySetName'))]"
+                "[concat('Microsoft.Resources/deployments/', 'SettingUpAvailabilitySet')]"
             ],
             "properties": {
                 "availabilitySet": {
-                    "id": "[resourceId('Microsoft.Compute/availabilitySets', parameters('availabilitySetName'))]"
+                    "id": "[reference('SettingUpAvailabilitySet').outputs.availabilitySetName.value]"
                 },
                 "hardwareProfile": {
                     "vmSize": "[parameters('vmSize')]"
