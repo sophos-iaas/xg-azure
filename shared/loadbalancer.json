@@ -1,0 +1,96 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "publicIpId": {
+            "type": "string"
+        },
+        "loadBalancerName": {
+            "type": "string"
+        }
+    },
+    "variables": {
+        "lbFrontendName": "loadBalancerFrontEnd",
+        "lbBackendName": "loadBalancerBackEnd",
+        "inboundNat1": "Webadmin-XG-1",
+        "inboundNat2": "Webadmin-XG-2",
+        "lbID": "[resourceId('Microsoft.Network/loadBalancers',parameters('loadBalancerName'))]",
+        "lbFrontendID": "[concat(variables('lbID'),'/frontendIPConfigurations/',variables('lbFrontendName'))]",
+        "lbBackendID": "[concat(variables('lbID'),'/backendAddressPools/',variables('lbBackendName'))]",
+        "inboundNat1ID": "[concat(variables('lbID'),'/inboundNatRules/',variables('inboundNat1'))]",
+        "inboundNat2ID": "[concat(variables('lbID'),'/inboundNatRules/',variables('inboundNat2'))]"
+    },
+    "resources": [
+        {
+            "apiVersion": "2016-03-30",
+            "name": "[parameters('loadBalancerName')]",
+            "type": "Microsoft.Network/loadBalancers",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "frontendIPConfigurations": [
+                    {
+                        "name": "[variables('lbFrontendName')]",
+                        "properties": {
+                            "publicIPAddress": {
+                                "id": "[parameters('publicIpId')]"
+                            }
+                        }
+                    }
+                ],
+                "backendAddressPools": [
+                    {
+                        "name": "[variables('lbBackendName')]"
+                    }
+                ],
+                "inboundNatRules": [
+                    {
+                        "name": "[variables('inboundNat1')]",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[variables('lbFrontendID')]"
+                            },
+                            "protocol": "tcp",
+                            "frontendPort": 4445,
+                            "backendPort": 4444,
+                            "enableFloatingIP": false
+                        }
+                    },
+                    {
+                        "name": "[variables('inboundNat2')]",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[variables('lbFrontendID')]"
+                            },
+                            "protocol": "tcp",
+                            "frontendPort": 4446,
+                            "backendPort": 4444,
+                            "enableFloatingIP": false
+                        }
+                    }
+                ]
+            }
+        }
+    ],
+    "outputs": {
+        "lbID": {
+            "value": "[variables('lbID')]",
+            "type": "string"
+        },
+        "lbFrontendID": {
+            "value": "[variables('lbFrontendID')]",
+            "type": "string"
+        },
+        "lbBackendID": {
+            "value": "[variables('lbBackendID')]",
+            "type": "string"
+        },
+        "inboundNat1ID": {
+            "value": "[variables('inboundNat1ID')]",
+            "type": "string"
+        },
+        "inboundNat2ID": {
+            "value": "[variables('inboundNat2ID')]",
+            "type": "string"
+        }
+    }
+}

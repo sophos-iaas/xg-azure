@@ -202,11 +202,11 @@
             }
         },
         "trustedNetwork": {
-          "type": "string",
-          "defaultValue": "*",
-          "metadata": {
-              "description": "Trusted network for admin access. Using * will allow traffic from everywhere; using a CIDR notation, e.g., 203.0.113.0/24, will only allow traffic from that network range."
-          }
+            "type": "string",
+            "defaultValue": "*",
+            "metadata": {
+                "description": "Trusted network for admin access. Using * will allow traffic from everywhere; using a CIDR notation, e.g., 203.0.113.0/24, will only allow traffic from that network range."
+            }
         },
         "availabilitySetNewOrExisting": {
             "type": "string",
@@ -233,20 +233,16 @@
         "storageTemplate": "[concat(parameters('baseUrl'),'/shared/storageAccount-',parameters('storageNewOrExisting'),'.json')]",
         "availabilitySetTemplate": "[concat(parameters('baseUrl'),'/shared/availabilitySet-',parameters('availabilitySetNewOrExisting'),'.json')]",
         "networkSecurityGroupTemplate": "[concat(parameters('baseUrl'),'/shared/networkSecurityGroup-',parameters('networkSecurityGroupNewOrExisting'),'.json')]",
-        "vhdContainer": "vhds",
+        "interfaceWanTemplate": "[concat(parameters('baseUrl'),'/shared/interface-wan.json')]",
+        "interfaceLanTemplate": "[concat(parameters('baseUrl'),'/shared/interface-lan.json')]",
+        "interfaceLBTemplate": "[concat(parameters('baseUrl'),'/shared/interface-lb.json')]",
+        "vmTemplate": "[concat(parameters('baseUrl'),'/shared/vm.json')]",
         "publicIpType": "Dynamic",
-        "adminUsername": "azureuser",
-        "sshKeyPath": "[concat('/home/',variables('adminUsername'),'/.ssh/authorized_keys')]",
         "apiVersion": {
             "resources": {
                 "deployments": "2016-02-01"
-            },
-            "network": "2016-06-01",
-            "storage": "2016-01-01",
-            "compute": "2016-03-30"
-        },
-        "imagePublisher": "sophos",
-        "imageOffer": "sophos-xg"
+            }
+        }
     },
     "resources": [
         {
@@ -371,133 +367,99 @@
             }
         },
         {
-            "apiVersion": "[variables('apiVersion').network]",
-            "type": "Microsoft.Network/networkInterfaces",
-            "name": "[parameters('nicWan')]",
-            "location": "[parameters('location')]",
+            "name": "SettingUpInterfaceWan",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "[variables('apiVersion').resources.deployments]",
             "dependsOn": [
                 "[concat('Microsoft.Resources/deployments/', 'SettingUpPublicIP')]",
                 "[concat('Microsoft.Resources/deployments/', 'SettingUpVirtualNetwork')]",
                 "[concat('Microsoft.Resources/deployments/', 'SettingUpNetworkSecurityGroup')]"
             ],
             "properties": {
-                "networkSecurityGroup": {
-                  "id": "[reference('SettingUpNetworkSecurityGroup','2015-01-01').outputs.networkSecurityGroupName.value]"
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('interfaceWanTemplate')]",
+                    "contentVersion": "1.0.0.0"
                 },
-                "ipConfigurations": [
-                    {
-                        "name": "ipconfig",
-                        "properties": {
-                            "privateIPAllocationMethod": "Dynamic",
-                            "publicIPAddress": {
-                                "id": "[reference('SettingUpPublicIP').outputs.publicIpId.value]"
-                            },
-                            "subnet": {
-                                "id": "[reference('SettingUpVirtualNetwork','2015-01-01').outputs.subnet1Ref.value]"
-                            }
-                        }
+                "parameters": {
+                    "interfaceName": {
+                        "value": "[parameters('nicWan')]"
+                    },
+                    "subnetRef": {
+                        "value": "[reference('SettingUpVirtualNetwork','2015-01-01').outputs.subnet1Ref.value]"
+                    },
+                    "publicIpId": {
+                        "value": "[reference('SettingUpPublicIP').outputs.publicIpId.value]"
+                    },
+                    "networkSecurityGroupId": {
+                        "value": "[reference('SettingUpNetworkSecurityGroup','2015-01-01').outputs.networkSecurityGroupName.value]"
                     }
-                ],
-                "enableIPForwarding": true
+                }
             }
         },
         {
-            "apiVersion": "[variables('apiVersion').network]",
-            "type": "Microsoft.Network/networkInterfaces",
-            "name": "[parameters('nicLan')]",
-            "location": "[parameters('location')]",
+            "name": "SettingUpInterfaceLan",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "[variables('apiVersion').resources.deployments]",
             "dependsOn": [
                 "[concat('Microsoft.Resources/deployments/', 'SettingUpVirtualNetwork')]"
             ],
             "properties": {
-                "ipConfigurations": [
-                    {
-                        "name": "ipconfig",
-                        "properties": {
-                            "privateIPAllocationMethod": "Dynamic",
-                            "subnet": {
-                                "id": "[reference('SettingUpVirtualNetwork','2015-01-01').outputs.subnet2Ref.value]"
-                            }
-                        }
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('interfaceLanTemplate')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "interfaceName": {
+                        "value": "[parameters('nicLan')]"
+                    },
+                    "subnetRef": {
+                        "value": "[reference('SettingUpVirtualNetwork','2015-01-01').outputs.subnet2Ref.value]"
                     }
-                ],
-                "enableIPForwarding": true
+                }
             }
         },
         {
-            "apiVersion": "[variables('apiVersion').compute]",
-            "type": "Microsoft.Compute/virtualMachines",
-            "name": "[parameters('vmName')]",
-            "plan": {
-                "publisher": "[variables('imagePublisher')]",
-                "product": "[variables('imageOffer')]",
-                "name": "[parameters('imageSku')]"
-            },
-            "location": "[parameters('location')]",
+            "name": "SettingUpVm",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "[variables('apiVersion').resources.deployments]",
             "dependsOn": [
-                "[concat('Microsoft.Network/networkInterfaces/', parameters('nicWan'))]",
-                "[concat('Microsoft.Network/networkInterfaces/', parameters('nicLan'))]",
+                "[concat('Microsoft.Resources/deployments/', 'SettingUpInterfaceWan')]",
+                "[concat('Microsoft.Resources/deployments/', 'SettingUpInterfaceLan')]",
                 "[concat('Microsoft.Resources/deployments/', 'SettingUpStorageAccount')]",
                 "[concat('Microsoft.Resources/deployments/', 'SettingUpAvailabilitySet')]"
             ],
             "properties": {
-                "availabilitySet": {
-                    "id": "[reference('SettingUpAvailabilitySet').outputs.availabilitySetName.value]"
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('vmTemplate')]",
+                    "contentVersion": "1.0.0.0"
                 },
-                "hardwareProfile": {
-                    "vmSize": "[parameters('vmSize')]"
-                },
-                "osProfile": {
-                    "computerName": "[parameters('vmName')]",
-                    "adminUsername": "[variables('adminUsername')]",
-                    "adminPassword": "[parameters('adminPassword')]"
-                },
-                "storageProfile": {
-                    "imageReference": {
-                        "publisher": "[variables('imagePublisher')]",
-                        "offer": "[variables('imageOffer')]",
-                        "sku": "[parameters('imageSku')]",
-                        "version": "latest"
+                "parameters": {
+                    "vmName": {
+                        "value": "[parameters('vmName')]"
                     },
-                    "dataDisks": [
-                        {
-                            "name": "[concat(parameters('vmName'),'-dataDisk')]",
-                            "lun": 0,
-                            "createOption": "FromImage",
-                            "vhd": {
-                                "uri": "[concat(reference('SettingUpStorageAccount').outputs.storageAccountEndpoint.value, variables('vhdContainer'),'/',parameters('vmName'),'-aux.vhd')]"
-                            }
-                        }
-                    ],
-                    "osDisk": {
-                        "name": "[concat(parameters('vmName'),'-osDisk')]",
-                        "caching": "ReadWrite",
-                        "createOption": "FromImage",
-                        "vhd": {
-                            "uri": "[concat(reference('SettingUpStorageAccount').outputs.storageAccountEndpoint.value, variables('vhdContainer'),'/',parameters('vmName'),'-prim.vhd')]"
-                        }
-                    }
-                },
-                "networkProfile": {
-                    "networkInterfaces": [
-                        {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces',parameters('nicWan'))]",
-                            "properties": {
-                                "primary": true
-                            }
-                        },
-                        {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces',parameters('nicLan'))]",
-                            "properties": {
-                                "primary": false
-                            }
-                        }
-                    ]
-                },
-                "diagnosticsProfile": {
-                    "bootDiagnostics": {
-                        "enabled": "true",
-                        "storageUri": "[reference('SettingUpStorageAccount').outputs.storageAccountEndpoint.value]"
+                    "vmSize": {
+                        "value": "[parameters('vmSize')]"
+                    },
+                    "adminPassword": {
+                        "value": "[parameters('adminPassword')]"
+                    },
+                    "imageSku": {
+                        "value": "[parameters('imageSku')]"
+                    },
+                    "availabilitySetId": {
+                        "value": "[reference('SettingUpAvailabilitySet').outputs.availabilitySetId.value]"
+                    },
+                    "storageAccountEndpoint": {
+                        "value": "[reference('SettingUpStorageAccount').outputs.storageAccountEndpoint.value]"
+                    },
+                    "interfaceRefWan": {
+                        "value": "[reference('SettingUpInterfaceWan','2015-01-01').outputs.interfaceRef.value]"
+                    },
+                    "interfaceRefLan": {
+                        "value": "[reference('SettingUpInterfaceLan','2015-01-01').outputs.interfaceRef.value]"
                     }
                 }
             }
