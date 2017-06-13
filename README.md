@@ -64,6 +64,19 @@ Either choose to run the Basic Setup wizard, or skip it and start to configure t
 
 ***
 
+High Availability
+=================
+
+We also provide an example template for High Availability, which deploys multiple XG firewalls and an Azure loadbalancer.
+
+Configuration sync can be done by using CSFM. Please reach out for your sales or channel representative to learn more about this Sophos product.
+
+<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fsophos-iaas%2Fxg-azure%2Fmaster%2FinboundHa.json" target="_blank">
+    <img src="http://azuredeploy.net/deploybutton.png"/>
+</a>
+
+***
+
 Useful Links
 ============
 
