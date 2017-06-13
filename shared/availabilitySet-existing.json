@@ -1,17 +1,18 @@
 {
-  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-  "contentVersion": "1.0.0.0",
-  "parameters": {
-    "availabilitySetName": {
-      "type": "string"
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "availabilitySetName": {
+            "type": "string"
+        }
+    },
+    "resources": [
+
+    ],
+    "outputs": {
+        "availabilitySetId": {
+            "type": "string",
+            "value": "[resourceId('Microsoft.Compute/availabilitySets',parameters('availabilitySetName'))]"
+        }
     }
-  },
-  "resources": [
-  ],
-  "outputs": {
-    "availabilitySetName": {
-      "type": "string",
-      "value": "[resourceId('Microsoft.Compute/availabilitySets',parameters('availabilitySetName'))]"
-    }
-  }
 }

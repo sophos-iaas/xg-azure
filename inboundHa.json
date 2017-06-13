@@ -225,6 +225,15 @@
             "metadata": {
                 "description": "Name of the Availability Set"
             }
+        },
+        "numberOfInstances": {
+            "type": "int",
+            "defaultValue": 2,
+            "minValue": 0,
+            "maxValue": 5,
+            "metadata": {
+                "description": "Number of XG Firewall instances to be deployed."
+            }
         }
     },
     "variables": {
@@ -246,6 +255,32 @@
         }
     },
     "resources": [
+        {
+            "name": "SettingUpLoadbalancer",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "[variables('apiVersion').resources.deployments]",
+            "dependsOn": [
+                "[concat('Microsoft.Resources/deployments/', 'SettingUpPublicIP')]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('LBTemplate')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "publicIpId": {
+                        "value": "[reference('SettingUpPublicIP').outputs.publicIpId.value]"
+                    },
+                    "loadBalancerName": {
+                        "value": "Loadbalancer"
+                    },
+                    "numberOfInstances": {
+                        "value": "[parameters('numberOfInstances')]"
+                    }
+                }
+            }
+        },
         {
             "name": "SettingUpAvailabilitySet",
             "type": "Microsoft.Resources/deployments",
@@ -368,29 +403,36 @@
             }
         },
         {
-            "name": "SettingUpInterfaceWan",
+            "name": "[concat('SettingUpInterfaceWan', copyIndex())]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "[variables('apiVersion').resources.deployments]",
+            "copy": {
+                "name": "InterfaceWanLoop",
+                "count": "[parameters('numberOfInstances')]"
+            },
             "dependsOn": [
-                "[concat('Microsoft.Resources/deployments/', 'SettingUpPublicIP')]",
+                "[concat('Microsoft.Resources/deployments/', 'SettingUpLoadbalancer')]",
                 "[concat('Microsoft.Resources/deployments/', 'SettingUpVirtualNetwork')]",
                 "[concat('Microsoft.Resources/deployments/', 'SettingUpNetworkSecurityGroup')]"
             ],
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[variables('interfaceWanTemplate')]",
+                    "uri": "[variables('interfaceLBTemplate')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
                     "interfaceName": {
-                        "value": "[parameters('nicWan')]"
+                        "value": "[concat(parameters('nicWan'),'-', copyIndex())]"
                     },
                     "subnetRef": {
                         "value": "[reference('SettingUpVirtualNetwork','2015-01-01').outputs.subnet1Ref.value]"
                     },
-                    "publicIpId": {
-                        "value": "[reference('SettingUpPublicIP').outputs.publicIpId.value]"
+                    "lbBackendID": {
+                        "value": "[reference('SettingUpLoadbalancer').outputs.lbBackendID.value]"
+                    },
+                    "inboundNatID": {
+                        "value": "[concat(reference('SettingUpLoadbalancer').outputs.inboundNatIDPrefix.value, copyIndex())]"
                     },
                     "networkSecurityGroupId": {
                         "value": "[reference('SettingUpNetworkSecurityGroup','2015-01-01').outputs.networkSecurityGroupName.value]"
@@ -399,9 +441,13 @@
             }
         },
         {
-            "name": "SettingUpInterfaceLan",
+            "name": "[concat('SettingUpInterfaceLan', copyIndex())]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "[variables('apiVersion').resources.deployments]",
+            "copy": {
+                "name": "InterfaceLanLoop",
+                "count": "[parameters('numberOfInstances')]"
+            },
             "dependsOn": [
                 "[concat('Microsoft.Resources/deployments/', 'SettingUpVirtualNetwork')]"
             ],
@@ -413,7 +459,7 @@
                 },
                 "parameters": {
                     "interfaceName": {
-                        "value": "[parameters('nicLan')]"
+                        "value": "[concat(parameters('nicLan'),'-', copyIndex())]"
                     },
                     "subnetRef": {
                         "value": "[reference('SettingUpVirtualNetwork','2015-01-01').outputs.subnet2Ref.value]"
@@ -422,12 +468,16 @@
             }
         },
         {
-            "name": "SettingUpVm",
+            "name": "[concat('SettingUpVm', copyIndex())]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "[variables('apiVersion').resources.deployments]",
+            "copy": {
+                "name": "VmLoop",
+                "count": "[parameters('numberOfInstances')]"
+            },
             "dependsOn": [
-                "[concat('Microsoft.Resources/deployments/', 'SettingUpInterfaceWan')]",
-                "[concat('Microsoft.Resources/deployments/', 'SettingUpInterfaceLan')]",
+                "[concat('Microsoft.Resources/deployments/', 'SettingUpInterfaceWan', copyIndex())]",
+                "[concat('Microsoft.Resources/deployments/', 'SettingUpInterfaceLan', copyIndex())]",
                 "[concat('Microsoft.Resources/deployments/', 'SettingUpStorageAccount')]",
                 "[concat('Microsoft.Resources/deployments/', 'SettingUpAvailabilitySet')]"
             ],
@@ -439,7 +489,7 @@
                 },
                 "parameters": {
                     "vmName": {
-                        "value": "[parameters('vmName')]"
+                        "value": "[concat(parameters('vmName'),'-', copyIndex())]"
                     },
                     "vmSize": {
                         "value": "[parameters('vmSize')]"
@@ -457,10 +507,10 @@
                         "value": "[reference('SettingUpStorageAccount').outputs.storageAccountEndpoint.value]"
                     },
                     "interfaceRefWan": {
-                        "value": "[reference('SettingUpInterfaceWan','2015-01-01').outputs.interfaceRef.value]"
+                        "value": "[reference(concat('SettingUpInterfaceWan', copyIndex()),'2015-01-01').outputs.interfaceRef.value]"
                     },
                     "interfaceRefLan": {
-                        "value": "[reference('SettingUpInterfaceLan','2015-01-01').outputs.interfaceRef.value]"
+                        "value": "[reference(concat('SettingUpInterfaceLan', copyIndex()),'2015-01-01').outputs.interfaceRef.value]"
                     }
                 }
             }
