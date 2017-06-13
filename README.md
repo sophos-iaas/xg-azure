@@ -16,9 +16,9 @@ Deployment via template
 
 1) Press the appropriate deployment button and enter your Azure credentials when prompted.
 
-[![Deploy](https://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fsophos-iaas%2Fxg-azure%2Fmaster%2FmainTemplate.json)
+[![Deploy to Azure](https://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fsophos-iaas%2Fxg-azure%2Fmaster%2FmainTemplate.json)
 
-[![Deploy](https://azuredeploy.net/AzureGov.png)](https://portal.azure.us/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fsophos-iaas%2Fxg-azure%2Fmaster%2FmainTemplate.json)
+[![Deploy to Azure](https://azuredeploy.net/AzureGov.png)](https://portal.azure.us/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fsophos-iaas%2Fxg-azure%2Fmaster%2FmainTemplate.json)
 
 2) Take a look on the example values for template parameters in `mainTemplateParameters.json`.
 
@@ -43,7 +43,7 @@ Connect to the VM instance
 Registration
 ============
 
-1) Get a demo license here: <a href="https://secure2.sophos.com/en-us/products/next-gen-firewall/free-trial.aspx">Sophos - Free Trial</a>.
+1) Get a demo license here: [Sophos - Free Trial](https://secure2.sophos.com/en-us/products/next-gen-firewall/free-trial.aspx).
 
 2) Enter the serial number you received via e-mail on the admin UI of your XG Firewall and activate the device.
 
