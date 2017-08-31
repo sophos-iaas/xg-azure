@@ -38,16 +38,37 @@
         "vhdContainer": "vhds"
     },
     "resources": [
+       {
+            "apiVersion": "2017-03-30",
+            "type": "Microsoft.Compute/images",
+            "name": "disks",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "storageProfile": {
+                    "osDisk": {
+                        "osType": "Linux",
+                        "osState": "Generalized",
+                        "caching": "ReadWrite",
+                        "blobUri": "[concat(parameters('devFwBlobUrlPrefix'),'-prim.vhd')]",
+                        "storageAccountType": "Standard_LRS"
+                    },
+                    "dataDisks": [{
+                        "caching": "ReadWrite",
+                        "blobUri": "[concat(parameters('devFwBlobUrlPrefix'),'-aux.vhd')]",
+                        "lun": 0,
+                        "storageAccountType": "Standard_LRS"
+                    }]
+                }
+            }
+        },
         {
             "apiVersion": "2017-03-30",
             "type": "Microsoft.Compute/virtualMachines",
             "name": "[parameters('vmName')]",
-            "plan": {
-                "publisher": "[variables('imagePublisher')]",
-                "product": "[variables('imageOffer')]",
-                "name": "[parameters('imageSku')]"
-            },
             "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Compute/images/', 'disks')]"
+            ],
             "properties": {
                 "availabilitySet": {
                     "id": "[parameters('availabilitySetId')]"
@@ -62,28 +83,19 @@
                 },
                 "storageProfile": {
                     "imageReference": {
-                        "publisher": "[variables('imagePublisher')]",
-                        "offer": "[variables('imageOffer')]",
-                        "sku": "[parameters('imageSku')]",
-                        "version": "latest"
+                        "id": "[resourceId('Microsoft.Compute/images/', 'disks')]"
                     },
                     "dataDisks": [
                         {
                             "name": "[concat(parameters('vmName'),'-dataDisk')]",
                             "lun": 0,
-                            "createOption": "FromImage",
-                            "vhd": {
-                                "uri": "[concat(parameters('storageAccountEndpoint'), variables('vhdContainer'),'/',parameters('vmName'),'-aux.vhd')]"
-                            }
+                            "createOption": "FromImage"
                         }
                     ],
                     "osDisk": {
                         "name": "[concat(parameters('vmName'),'-osDisk')]",
                         "caching": "ReadWrite",
-                        "createOption": "FromImage",
-                        "vhd": {
-                            "uri": "[concat(parameters('storageAccountEndpoint'), variables('vhdContainer'),'/',parameters('vmName'),'-prim.vhd')]"
-                        }
+                        "createOption": "FromImage"
                     }
                 },
                 "networkProfile": {
