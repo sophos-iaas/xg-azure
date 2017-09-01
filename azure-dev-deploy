@@ -1,0 +1,96 @@
+#!/usr/bin/env ruby
+
+require 'json'
+require 'securerandom'
+
+# Since this script is for deploying testing machines we always set the same simple admin password.
+# It has to fulfill the password policy of Azure, though. Otherwise the deployment will fail.
+$ADMIN_PASSWORD = "_Pppp123"
+
+# The example params file maintained in the xg-azure repository.
+$PARAMS_FILE = "mainTemplateParameters.json"
+
+# A temporary file containing the template parameters that we recreate
+# with each run of this program. We use mainTemplateParameters.json as
+# base file.
+$GENERATED_PARAMS_FILE = "azure-dev-deploy-parameters.json"
+
+def usage
+  puts "Usage: #{$0} LOCATION IMAGE_PREFIX"
+  puts
+  puts "This program creates a development deployment of a Sophos XG in "
+  puts "Azure from an image URL prefix and an ARM template. It has to be"
+  puts "executed from a directory containing the xg-azure templates."
+  puts
+  puts "Arguments:"
+  puts
+  puts "LOCATION: The Azure location to deploy to."
+  puts "IMAGE_PREFIX:   URL prefix of the image to use in the Azure cloud storage."
+  puts
+  puts "Example: "
+  puts "#{$0} mygroup https://sophosnsgimages.blob.core.windows.net/azi/SFAZ01_SO01.Release_Develop_CLOUD.17.01.1.266.payg"
+  puts
+  puts "All instances are deployed with admin password '#{$ADMIN_PASSWORD}'"
+
+  exit(1)
+end
+
+def check_template_dir_file_exists(filename)
+  if !File.exists?(filename)
+    STDERR.puts "Couldn't find #{filename} in current directory (#{Dir.pwd})"
+    STDERR.puts "Are you sure you are in a directory containing the xg-azure templates?"
+    exit(1)
+  end
+end
+
+def generate_random_part_storage
+  SecureRandom.hex(3)
+end
+
+def generate_random_part_dns
+  SecureRandom.hex(3)
+end
+
+def generate_random_part_resource_group
+  SecureRandom.hex(3)
+end
+
+def generate_parameters_file(image_prefix)
+  str = File.read($PARAMS_FILE)
+  data = JSON.parse(str)
+
+  data["parameters"]["adminPassword"]["value"] = $ADMIN_PASSWORD
+  data["parameters"]["storageName"]["value"] = "xgazure#{generate_random_part_storage}"
+  data["parameters"]["publicIpDNS"]["value"] = "sfostest-#{generate_random_part_dns}"
+  data["parameters"]["devFwBlobUrlPrefix"] = Hash.new
+  data["parameters"]["devFwBlobUrlPrefix"]["value"] = image_prefix
+
+  File.open($GENERATED_PARAMS_FILE, "w") do |f|
+    f.write(JSON.generate(data))
+  end
+end
+
+def create_resource_group(location)
+  group_name = "dev-#{generate_random_part_resource_group}"
+  status = system("azure group create --location westeurope #{group_name}")
+
+  exit(1) if status == false
+
+  group_name
+end
+
+def run(resource_group)
+  check_template_dir_file_exists("mainTemplate.json")
+  system("azure group deployment create -f mainTemplate.json -e #{$GENERATED_PARAMS_FILE} -g r1 --verbose")
+end
+
+if ARGV.length != 2
+  usage
+end
+
+location = ARGV[0]
+image_prefix = ARGV[1]
+
+generate_parameters_file(image_prefix)
+resource_group = create_resource_group(location)
+run(resource_group)
