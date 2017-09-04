@@ -81,7 +81,7 @@ end
 
 def run(resource_group)
   check_template_dir_file_exists("mainTemplate.json")
-  system("azure group deployment create -f mainTemplate.json -e #{$GENERATED_PARAMS_FILE} -g r1 --verbose")
+  system("azure group deployment create -f mainTemplate.json -e #{$GENERATED_PARAMS_FILE} -g #{resource_group} --verbose")
 end
 
 if ARGV.length != 2
