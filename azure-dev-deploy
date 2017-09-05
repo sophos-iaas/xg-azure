@@ -24,11 +24,11 @@ def usage
   puts
   puts "Arguments:"
   puts
-  puts "LOCATION: The Azure location to deploy to."
+  puts "LOCATION: The Azure location to deploy to. Must match the location of the image VHD store."
   puts "IMAGE_PREFIX:   URL prefix of the image to use in the Azure cloud storage."
   puts
   puts "Example: "
-  puts "#{$0} mygroup https://sophosnsgimages.blob.core.windows.net/azi/SFAZ01_SO01.Release_Develop_CLOUD.17.01.1.266.payg"
+  puts "#{$0} westeurope https://sophosnsgimages.blob.core.windows.net/azi/SFAZ01_SO01.Release_Develop_CLOUD.17.01.1.266.payg"
   puts
   puts "All instances are deployed with admin password '#{$ADMIN_PASSWORD}'"
 
@@ -43,25 +43,13 @@ def check_template_dir_file_exists(filename)
   end
 end
 
-def generate_random_part_storage
-  SecureRandom.hex(3)
-end
-
-def generate_random_part_dns
-  SecureRandom.hex(3)
-end
-
-def generate_random_part_resource_group
-  SecureRandom.hex(3)
-end
-
-def generate_parameters_file(image_prefix)
+def generate_parameters_file(image_prefix, id)
   str = File.read($PARAMS_FILE)
   data = JSON.parse(str)
 
   data["parameters"]["adminPassword"]["value"] = $ADMIN_PASSWORD
-  data["parameters"]["storageName"]["value"] = "xgazure#{generate_random_part_storage}"
-  data["parameters"]["publicIpDNS"]["value"] = "sfostest-#{generate_random_part_dns}"
+  data["parameters"]["storageName"]["value"] = "xgazure#{id}"
+  data["parameters"]["publicIpDNS"]["value"] = "sfostest-#{id}"
   data["parameters"]["devFwBlobUrlPrefix"] = Hash.new
   data["parameters"]["devFwBlobUrlPrefix"]["value"] = image_prefix
 
@@ -70,9 +58,9 @@ def generate_parameters_file(image_prefix)
   end
 end
 
-def create_resource_group(location)
-  group_name = "dev-#{generate_random_part_resource_group}"
-  status = system("azure group create --location westeurope #{group_name}")
+def create_resource_group(location, id)
+  group_name = "dev-#{id}"
+  status = system("azure group create --location #{location} #{group_name}")
 
   exit(1) if status == false
 
@@ -91,6 +79,8 @@ end
 location = ARGV[0]
 image_prefix = ARGV[1]
 
-generate_parameters_file(image_prefix)
-resource_group = create_resource_group(location)
+id = SecureRandom.hex(3)
+
+generate_parameters_file(image_prefix, id)
+resource_group = create_resource_group(location, id)
 run(resource_group)
