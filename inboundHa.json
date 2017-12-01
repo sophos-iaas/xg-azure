@@ -226,11 +226,13 @@
                 "description": "Name of the Availability Set"
             }
         },
-        "devFwBlobUrlPrefix": {
-            "type": "string",
-            "defaultValue": "",
+        "numberOfInstances": {
+            "type": "int",
+            "defaultValue": 2,
+            "minValue": 0,
+            "maxValue": 5,
             "metadata": {
-                "description": "For development only! Specifies the blob URL prefix of a development firmware. Example: https://exampleimages.blob.core.windows.net/azi/SFAZ01_SO01.Release_17.0_CLOUD.17.00.0.007.byol"
+                "description": "Number of XG Firewall instances to be deployed."
             }
         }
     },
@@ -238,13 +240,14 @@
         "publicIpTemplate": "[concat(parameters('baseUrl'),'/shared/publicip-',parameters('publicIpNewOrExisting'),'.json')]",
         "netTemplate": "[concat(parameters('baseUrl'),'/shared/vnet-',parameters('netNewOrExisting'),'.json')]",
         "storageTemplate": "[concat(parameters('baseUrl'),'/shared/storageAccount-',parameters('storageNewOrExisting'),'.json')]",
-        "availabilitySetTemplate": "[concat(parameters('baseUrl'),'/shared/availabilitySet-',parameters('availabilitySetNewOrExisting'), if(equals(parameters('devFwBlobUrlPrefix'), ''), '', '-aligned'),'.json')]",
+        "availabilitySetTemplate": "[concat(parameters('baseUrl'),'/shared/availabilitySet-',parameters('availabilitySetNewOrExisting'),'.json')]",
         "networkSecurityGroupTemplate": "[concat(parameters('baseUrl'),'/shared/networkSecurityGroup-',parameters('networkSecurityGroupNewOrExisting'),'.json')]",
         "interfaceWanTemplate": "[concat(parameters('baseUrl'),'/shared/interface-wan.json')]",
         "interfaceLanTemplate": "[concat(parameters('baseUrl'),'/shared/interface-lan.json')]",
         "interfaceLBTemplate": "[concat(parameters('baseUrl'),'/shared/interface-lb.json')]",
-        "vmTemplate": "[concat(parameters('baseUrl'),if(equals(parameters('devFwBlobUrlPrefix'), ''), '/shared/vm.json', '/shared/vm_dev.json'))]",
+        "vmTemplate": "[concat(parameters('baseUrl'),'/shared/vm.json')]",
         "LBTemplate": "[concat(parameters('baseUrl'),'/shared/loadbalancer.json')]",
+        "securityRuleAllowHTTPTemplate": "[concat(parameters('baseUrl'),'/shared/inboundSecurityRuleAllowHttp.json')]",
         "publicIpType": "Dynamic",
         "apiVersion": {
             "resources": {
@@ -314,6 +317,29 @@
             }
         },
         {
+            "name": "SettingUpSecurityRuleAllowHTTP",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "[variables('apiVersion').resources.deployments]",
+            "dependsOn": [
+                "[concat('Microsoft.Resources/deployments/', 'SettingUpNetworkSecurityGroup')]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('securityRuleAllowHTTPTemplate')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "networkSecurityGroupName": {
+                        "value": "[parameters('networkSecurityGroupName')]"
+                    },
+                    "trustedNetwork": {
+                        "value": "*"
+                    }
+                }
+            }
+        },
+        {
             "name": "SettingUpPublicIP",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "[variables('apiVersion').resources.deployments]",
@@ -375,29 +401,62 @@
             }
         },
         {
-            "name": "SettingUpInterfaceWan",
+            "name": "SettingUpLoadbalancer",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "[variables('apiVersion').resources.deployments]",
             "dependsOn": [
-                "[concat('Microsoft.Resources/deployments/', 'SettingUpPublicIP')]",
+                "[concat('Microsoft.Resources/deployments/', 'SettingUpPublicIP')]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('LBTemplate')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "publicIpId": {
+                        "value": "[reference('SettingUpPublicIP').outputs.publicIpId.value]"
+                    },
+                    "loadBalancerName": {
+                        "value": "Loadbalancer"
+                    },
+                    "numberOfInstances": {
+                        "value": "[parameters('numberOfInstances')]"
+                    }
+                }
+            }
+        },
+        {
+            "name": "[concat('SettingUpInterfaceWan', copyIndex())]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "[variables('apiVersion').resources.deployments]",
+            "copy": {
+                "name": "InterfaceWanLoop",
+                "count": "[parameters('numberOfInstances')]"
+            },
+            "dependsOn": [
+                "[concat('Microsoft.Resources/deployments/', 'SettingUpLoadbalancer')]",
                 "[concat('Microsoft.Resources/deployments/', 'SettingUpVirtualNetwork')]",
                 "[concat('Microsoft.Resources/deployments/', 'SettingUpNetworkSecurityGroup')]"
             ],
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[variables('interfaceWanTemplate')]",
+                    "uri": "[variables('interfaceLBTemplate')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
                     "interfaceName": {
-                        "value": "[parameters('nicWan')]"
+                        "value": "[concat(parameters('nicWan'),'-', copyIndex())]"
                     },
                     "subnetRef": {
                         "value": "[reference('SettingUpVirtualNetwork','2015-01-01').outputs.subnet1Ref.value]"
                     },
-                    "publicIpId": {
-                        "value": "[reference('SettingUpPublicIP').outputs.publicIpId.value]"
+                    "lbBackendID": {
+                        "value": "[reference('SettingUpLoadbalancer').outputs.lbBackendID.value]"
+                    },
+                    "inboundNatID": {
+                        "value": "[concat(reference('SettingUpLoadbalancer').outputs.inboundNatIDPrefix.value, copyIndex())]"
                     },
                     "networkSecurityGroupId": {
                         "value": "[reference('SettingUpNetworkSecurityGroup','2015-01-01').outputs.networkSecurityGroupName.value]"
@@ -406,9 +465,13 @@
             }
         },
         {
-            "name": "SettingUpInterfaceLan",
+            "name": "[concat('SettingUpInterfaceLan', copyIndex())]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "[variables('apiVersion').resources.deployments]",
+            "copy": {
+                "name": "InterfaceLanLoop",
+                "count": "[parameters('numberOfInstances')]"
+            },
             "dependsOn": [
                 "[concat('Microsoft.Resources/deployments/', 'SettingUpVirtualNetwork')]"
             ],
@@ -420,7 +483,7 @@
                 },
                 "parameters": {
                     "interfaceName": {
-                        "value": "[parameters('nicLan')]"
+                        "value": "[concat(parameters('nicLan'),'-', copyIndex())]"
                     },
                     "subnetRef": {
                         "value": "[reference('SettingUpVirtualNetwork','2015-01-01').outputs.subnet2Ref.value]"
@@ -429,12 +492,16 @@
             }
         },
         {
-            "name": "SettingUpVm",
+            "name": "[concat('SettingUpVm', copyIndex())]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "[variables('apiVersion').resources.deployments]",
+            "copy": {
+                "name": "VmLoop",
+                "count": "[parameters('numberOfInstances')]"
+            },
             "dependsOn": [
-                "[concat('Microsoft.Resources/deployments/', 'SettingUpInterfaceWan')]",
-                "[concat('Microsoft.Resources/deployments/', 'SettingUpInterfaceLan')]",
+                "[concat('Microsoft.Resources/deployments/', 'SettingUpInterfaceWan', copyIndex())]",
+                "[concat('Microsoft.Resources/deployments/', 'SettingUpInterfaceLan', copyIndex())]",
                 "[concat('Microsoft.Resources/deployments/', 'SettingUpStorageAccount')]",
                 "[concat('Microsoft.Resources/deployments/', 'SettingUpAvailabilitySet')]"
             ],
@@ -446,7 +513,7 @@
                 },
                 "parameters": {
                     "vmName": {
-                        "value": "[parameters('vmName')]"
+                        "value": "[concat(parameters('vmName'),'-', copyIndex())]"
                     },
                     "vmSize": {
                         "value": "[parameters('vmSize')]"
@@ -464,13 +531,10 @@
                         "value": "[reference('SettingUpStorageAccount').outputs.storageAccountEndpoint.value]"
                     },
                     "interfaceRefWan": {
-                        "value": "[reference('SettingUpInterfaceWan','2015-01-01').outputs.interfaceRef.value]"
+                        "value": "[reference(concat('SettingUpInterfaceWan', copyIndex()),'2015-01-01').outputs.interfaceRef.value]"
                     },
                     "interfaceRefLan": {
-                        "value": "[reference('SettingUpInterfaceLan','2015-01-01').outputs.interfaceRef.value]"
-                    },
-                    "devFwBlobUrlPrefix": {
-                        "value": "[parameters('devFwBlobUrlPrefix')]"
+                        "value": "[reference(concat('SettingUpInterfaceLan', copyIndex()),'2015-01-01').outputs.interfaceRef.value]"
                     }
                 }
             }
