@@ -7,7 +7,7 @@ Deploying
 Deployment via Marketplace
 --------------------------
 
-1) Go to Azure Marketplace and search for 'Sophos': https://azuremarketplace.microsoft.com/marketplace/apps?search=Sophos%20XG
+1) Go to Azure Marketplace: https://azuremarketplace.microsoft.com/marketplace/apps?search=Sophos%20XG
 
 2) Select the "'Sophos XG Firewall' offer and follow the deployment wizard.
 
