@@ -1,36 +1,36 @@
 {
-  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-  "contentVersion": "1.0.0.0",
-  "parameters": {
-    "virtualNetworkName": {
-      "type": "string"
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "virtualNetworkName": {
+            "type": "string"
+        },
+        "virtualNetworkAddressPrefix": {
+            "type": "string"
+        },
+        "Subnet1Name": {
+            "type": "string"
+        },
+        "Subnet1Prefix": {
+            "type": "string"
+        },
+        "Subnet2Name": {
+            "type": "string"
+        },
+        "Subnet2Prefix": {
+            "type": "string"
+        },
+        "vnetExistingRGName": {
+            "type": "string",
+            "defaultValue": ""
+        }
     },
-    "virtualNetworkAddressPrefix": {
-      "type": "string"
+    "variables": {
+        "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
+        "subnet1": "[concat(variables('vnetID'),'/subnets/',parameters('Subnet1Name'))]",
+        "subnet2": "[concat(variables('vnetID'),'/subnets/',parameters('Subnet2Name'))]"
     },
-    "Subnet1Name": {
-      "type": "string"
-    },
-    "Subnet1Prefix": {
-      "type": "string"
-    },
-    "Subnet2Name": {
-      "type": "string"
-    },
-    "Subnet2Prefix": {
-      "type": "string"
-    },
-    "vnetExistingRGName" : {
-      "type" : "string",
-      "defaultValue" : ""
-    }
-  },
-  "variables" : {
-    "vnetID" : "[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
-    "subnet1" : "[concat(variables('vnetID'),'/subnets/',parameters('Subnet1Name'))]",
-    "subnet2" : "[concat(variables('vnetID'),'/subnets/',parameters('Subnet2Name'))]"
-  },
-  "resources": [
+    "resources": [
         {
             "apiVersion": "2016-06-01",
             "type": "Microsoft.Network/virtualNetworks",
@@ -58,15 +58,15 @@
                 ]
             }
         }
-  ],
-  "outputs": {
-    "subnet1Ref": {
-      "value": "[variables('subnet1')]",
-      "type": "string"
-    },
-    "subnet2Ref": {
-      "value": "[variables('subnet2')]",
-      "type": "string"
+    ],
+    "outputs": {
+        "subnet1Ref": {
+            "value": "[variables('subnet1')]",
+            "type": "string"
+        },
+        "subnet2Ref": {
+            "value": "[variables('subnet2')]",
+            "type": "string"
+        }
     }
-  }
 }

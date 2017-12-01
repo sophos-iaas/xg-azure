@@ -7,7 +7,18 @@
         }
     },
     "resources": [
-
+        {
+            "type": "Microsoft.Compute/availabilitySets",
+            "name": "[parameters('availabilitySetName')]",
+            "apiVersion": "2017-03-30",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "platformFaultDomainCount": 3
+            },
+            "sku": {
+                "name": "Aligned"
+            }
+        }
     ],
     "outputs": {
         "availabilitySetId": {
