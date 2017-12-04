@@ -65,7 +65,7 @@
                         "name": "vmCount",
                         "type": "Microsoft.Common.OptionsGroup",
                         "label": "Node Count",
-                        "defaultValue": 1,
+                        "defaultValue": "1",
                         "toolTip": "Choose either one or two nodes for the deployment",
                         "constraints": {
                             "allowedValues": [
