@@ -70,11 +70,11 @@
                         "constraints": {
                             "allowedValues": [
                                 {
-                                    "label": "ONE",
+                                    "label": "1",
                                     "value": "1"
                                 },
                                 {
-                                    "label": "TWO",
+                                    "label": "2",
                                     "value": "2"
                                 }
                             ]
@@ -204,6 +204,7 @@
             "vmName": "[basics('vmName')]",
             "adminPassword": "[basics('password')]",
             "vmSize": "[steps('instanceDetails').vmSize]",
+            "vmCount": "[steps('instanceDetails').vmCount]",
             "netNewOrExisting": "[steps('instanceDetails').vnetSpec.newOrExisting]",
             "netRG": "[steps('instanceDetails').vnetSpec.resourceGroup]",
             "netName": "[steps('instanceDetails').vnetSpec.name]",
