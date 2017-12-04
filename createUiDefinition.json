@@ -62,11 +62,23 @@
                         }
                     },
                     {
-                        "name":"vmCount",
-                        "type":"Microsoft.Common.TextBox",
-                        "defaultValue":1,
-                        "label":"How many nodes?",
-                        "toolTip":"Enter the number of VMs to provision (1 or 2)"
+                        "name": "vmCount",
+                        "type": "Microsoft.Common.OptionsGroup",
+                        "label": "Node Count",
+                        "defaultValue": 1,
+                        "toolTip": "Choose either one or two nodes for the deployment",
+                        "constraints": {
+                            "allowedValues": [
+                                {
+                                    "label": "One",
+                                    "value": 1
+                                },
+                                {
+                                    "label": "Two",
+                                    "value": 2
+                                }
+                            ]
+                        }
                     },
                     {
                         "name": "vmSize",
