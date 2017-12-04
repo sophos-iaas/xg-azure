@@ -70,12 +70,12 @@
                         "constraints": {
                             "allowedValues": [
                                 {
-                                    "label": "One",
-                                    "value": 1
+                                    "label": "ONE",
+                                    "value": "1"
                                 },
                                 {
-                                    "label": "Two",
-                                    "value": 2
+                                    "label": "TWO",
+                                    "value": "2"
                                 }
                             ]
                         }
