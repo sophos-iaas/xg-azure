@@ -62,6 +62,25 @@
                         }
                     },
                     {
+                        "name": "vmCount",
+                        "type": "Microsoft.Common.OptionsGroup",
+                        "label": "Node Count",
+                        "defaultValue": "One",
+                        "toolTip": "Choose either one or two nodes for the deployment",
+                        "constraints": {
+                            "allowedValues": [
+                                {
+                                    "label": "1",
+                                    "value": "1"
+                                },
+                                {
+                                    "label": "2",
+                                    "value": "2"
+                                }
+                            ]
+                        }
+                    },
+                    {
                         "name": "vmSize",
                         "type": "Microsoft.Compute.SizeSelector",
                         "label": "Virtual machine size",
@@ -91,7 +110,7 @@
                             "offer": "sophos-xg",
                             "sku": "[steps('instanceDetails').license]"
                         },
-                        "count": "1"
+                        "count": "[steps('instanceDetails').vmCount]"
                     },
                     {
                         "name": "vnetSpec",
@@ -185,6 +204,7 @@
             "vmName": "[basics('vmName')]",
             "adminPassword": "[basics('password')]",
             "vmSize": "[steps('instanceDetails').vmSize]",
+            "numberOfInstances": "[steps('instanceDetails').vmCount]",
             "netNewOrExisting": "[steps('instanceDetails').vnetSpec.newOrExisting]",
             "netRG": "[steps('instanceDetails').vnetSpec.resourceGroup]",
             "netName": "[steps('instanceDetails').vnetSpec.name]",
