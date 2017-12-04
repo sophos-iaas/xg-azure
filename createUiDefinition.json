@@ -62,6 +62,13 @@
                         }
                     },
                     {
+                        "name":"vmCount",
+                        "type":"Microsoft.Common.TextBox",
+                        "defaultValue":1,
+                        "label":"How many nodes?",
+                        "toolTip":"Enter the number of VMs to provision (1 or 2)"
+                    },
+                    {
                         "name": "vmSize",
                         "type": "Microsoft.Compute.SizeSelector",
                         "label": "Virtual machine size",
@@ -91,7 +98,7 @@
                             "offer": "sophos-xg",
                             "sku": "[steps('instanceDetails').license]"
                         },
-                        "count": "1"
+                        "count": "[steps('instanceDetails').vmCount]"
                     },
                     {
                         "name": "vnetSpec",
