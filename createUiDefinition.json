@@ -204,7 +204,7 @@
             "vmName": "[basics('vmName')]",
             "adminPassword": "[basics('password')]",
             "vmSize": "[steps('instanceDetails').vmSize]",
-            "vmCount": "[steps('instanceDetails').vmCount]",
+            "numberOfInstances": "[steps('instanceDetails').vmCount]",
             "netNewOrExisting": "[steps('instanceDetails').vnetSpec.newOrExisting]",
             "netRG": "[steps('instanceDetails').vnetSpec.resourceGroup]",
             "netName": "[steps('instanceDetails').vnetSpec.name]",
