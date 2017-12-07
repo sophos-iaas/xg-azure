@@ -226,6 +226,13 @@
                 "description": "Name of the Availability Set"
             }
         },
+        "devFwBlobUrlPrefix": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "(Backward compatibility support.)"
+            }
+        },
         "numberOfInstances": {
             "type": "int",
             "defaultValue": 2,
@@ -523,6 +530,9 @@
                     },
                     "imageSku": {
                         "value": "[parameters('imageSku')]"
+                    },
+                    "devFwBlobUrlPrefix": {
+                        "value": "[parameters('devFwBlobUrlPrefix')]"
                     },
                     "availabilitySetId": {
                         "value": "[reference('SettingUpAvailabilitySet').outputs.availabilitySetId.value]"
