@@ -9,6 +9,24 @@
                 "artifactsBaseUrl": "Base URL of the template package"
             }
         },
+        "ExistingPaygXgIpOrDns": {
+            "type": "string",
+            "metadata": {
+                "description": "The public IP or DNS name of the existing PAYG Sophos XG firewall"
+            }
+        },
+        "ExistingPaygXgAdminPassword": {
+            "type": "securestring",
+            "metadata": {
+                "description": "Password of the existing PAYG XG firewall"
+            }
+        },
+        "ExistingPaygXgSshPort": {
+            "type": "string",
+            "metadata": {
+                "description": "SSH port of the existing XG"
+            }
+        },
         "vmName": {
             "type": "string",
             "defaultValue": "XG-Firewall",
@@ -26,8 +44,7 @@
             "type": "string",
             "defaultValue": "byol",
             "allowedValues": [
-                "byol",
-                "payg"
+                "byol"
             ],
             "metadata": {
                 "description": "License type to use."
@@ -226,6 +243,22 @@
                 "description": "Name of the Availability Set"
             }
         },
+        "automationAccountNewOrExisting": {
+			"type": "string",
+			"allowedValues": [
+				"New",
+				"Existing"
+			],
+			"metadata": {
+				"description": "Create a new Azure Automation account or select an existing account to use for XG automation. WARNING: Automation account names are unique, so reusing an account name when creating a new account will overwirte the existing account!."
+			}
+		},
+		"automationAccountName": {
+			"type": "string",
+			"metadata": {
+				"description": "Enter the name of the Azure Automation account you wish to use / create. Note that when creating a new account the account name must be between 6 to 50 characters, and can contain only letters, numbers, and hyphens."
+			}
+		},
         "devFwBlobUrlPrefix": {
             "type": "string",
             "defaultValue": "",
@@ -250,7 +283,8 @@
             "resources": {
                 "deployments": "2016-02-01"
             }
-        }
+        },
+        "accountTemplate": "[concat('https://raw.githubusercontent.com/davidokeyode/sophos-xg-azure-custom-templates/payg-to-byol-conversion/shared/', parameters('automationAccountNewOrExisting'), 'aaaccountTemplate.json')]"
     },
     "resources": [
         {
@@ -474,6 +508,51 @@
                     }
                 }
             }
+        },
+        {
+			"name": "SettingUpAutomationAccount",
+			"apiVersion": "2015-01-01",
+			"type": "Microsoft.Resources/deployments",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[variables('accountTemplate')]",
+					"contentVersion": "1.0"
+				},
+				"parameters": {
+					"accountName": {
+						"value": "[parameters('automationAccountName')]"
+					},
+					"accountLocation": {
+						"value": "[parameters('location')]"
+					}
+				}
+			}
+        },
+        {
+			"name": "[concat(parameters('automationAccountName'),'/RunbookJob','-0')]",
+			"type": "Microsoft.Automation/automationAccounts/jobs",
+			"apiVersion": "2017-05-15-preview",
+			"dependsOn": [
+                "[concat('Microsoft.Resources/deployments/', 'SettingUpAutomationAccount')]",
+                "VmLoop"
+			],
+			"properties": {
+				"runbook": {
+				"name": "[reference('SettingUpAutomationAccount').outputs.runbook0Ref.value]"
+				},
+				"parameters": {
+                    "existingxgpassword": "[parameters('ExistingPaygXgAdminPassword')]",
+                    "existingxgsshport": "[parameters('ExistingPaygXgSshPort')]",
+                    "newxgpassword": "[parameters('adminPassword')]",
+					"portagw": "[concat(variables('lanNetwork'),'1')]",
+					"portbgw": "[concat(variables('wanNetwork'),'1')]",
+                    "hostname": "[reference('SettingUpPublicIP').outputs.fqdn.value]",
+                    "sastoken": "[reference('SettingUpStorageAccount').outputs.accountSAS.value]",
+                    "sshport": "2222"
+                    
+				}
+			}
         }
     ],
     "outputs": {

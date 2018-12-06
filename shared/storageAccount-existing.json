@@ -20,7 +20,16 @@
             "metadata": {
                 "Description": "Resource Group Name of the existing Storage Account"
             }
-        }
+        },
+        "storageAccountSasProperties": {
+            "type": "object",
+            "defaultValue": {
+              "signedServices": "bt",
+              "signedPermission": "acluw",
+              "signedExpiry": "2018-12-30T00:00:00Z",
+              "signedResourceTypes": "co"
+            }
+          }
     },
     "resources": [
 
@@ -33,6 +42,10 @@
         "storageAccountEndpoint": {
             "value": "[reference(resourceId(parameters('storageAccountExistingRG'), 'Microsoft.Storage/storageAccounts/', parameters('storageAccountName')), '2016-01-01').primaryEndpoints.blob]",
             "type": "string"
+        },
+        "accountSAS": {
+            "type": "string",
+            "value": "[listAccountSas(parameters('storageAccountName'), '2018-02-01', parameters('storageAccountSasProperties')).accountSasToken]"
         }
     }
 }
