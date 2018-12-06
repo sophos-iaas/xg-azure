@@ -50,6 +50,12 @@
                 "description": "License type to use."
             }
         },
+        "byolLicense": {
+            "type": "string",
+            "metadata": {
+                "description": "Serial number for the new BYOL Sophos XG."
+            }
+        },
         "vmSize": {
             "type": "string",
             "defaultValue": "Standard_A3",
@@ -542,9 +548,11 @@
 				"name": "[reference('SettingUpAutomationAccount').outputs.runbook0Ref.value]"
 				},
 				"parameters": {
+                    "existingxgip": "[parameters('ExistingPaygXgIpOrDns')]",
                     "existingxgpassword": "[parameters('ExistingPaygXgAdminPassword')]",
                     "existingxgsshport": "[parameters('ExistingPaygXgSshPort')]",
                     "newxgpassword": "[parameters('adminPassword')]",
+                    "byollicense": "[parameters('byolLicense')]",
 					"portagw": "[concat(variables('lanNetwork'),'1')]",
 					"portbgw": "[concat(variables('wanNetwork'),'1')]",
                     "hostname": "[reference('SettingUpPublicIP').outputs.fqdn.value]",
