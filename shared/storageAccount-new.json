@@ -21,7 +21,9 @@
             "metadata": {
                 "Description": "Resource Group Name of the existing Storage Account"
             }
-        },
+        }
+    },
+    "variables": {
         "storageAccountSasProperties": {
             "type": "object",
             "defaultValue": {
@@ -58,7 +60,7 @@
         },
         "accountSAS": {
             "type": "string",
-            "value": "[listAccountSas(parameters('storageAccountName'), '2018-02-01', parameters('storageAccountSasProperties')).accountSasToken]"
+            "value": "[listAccountSas(parameters('storageAccountName'), '2018-02-01', variables('storageAccountSasProperties')).accountSasToken]"
         }
     }
 }
