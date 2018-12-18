@@ -1,31 +1,46 @@
 Param
 (
   [Parameter (Mandatory= $true)]
-  [String] $password,
+  [String] $paygxgip,
   [Parameter (Mandatory= $true)]
-  [String] $portagw,
+  [String] $paygxgpassword,
   [Parameter (Mandatory= $true)]
-  [String] $portbgw,
+  [String] $paygxgsshport,
   [Parameter (Mandatory= $true)]
-  [String] $hostname,
+  [String] $storageaccount,
   [Parameter (Mandatory= $true)]
-  [String] $licensea,
-  [Parameter (Mandatory= $true)]
-  [String] $licenseb,
-  [Parameter (Mandatory= $true)]
-  [String] $sshport,
-  [Parameter (Mandatory= $true)]
-  [String] $sfmip
+  [String] $sastoken
 )
-$secpassword = ConvertTo-SecureString $password -AsPlainText -Force
+$secpassword = ConvertTo-SecureString $paygxgpassword -AsPlainText -Force
 $creds = New-Object System.Management.Automation.PSCredential ("admin", $secpassword)
-$session = New-SSHSession -ComputerName $hostname -Credential $creds -AcceptKey -Port $sshport
+$session = New-SSHSession -ComputerName $paygxgip -Credential $creds -AcceptKey -Port $paygxgsshport
 $SSHStream = New-SSHShellStream -SessionId $session.SessionId
-$licenseblock = @"
-opcode lic_doactivate -s nosync -t json -b '{"serialkey": "$licensea"}'
+$backupblock1 = @"
+opcode system_backup_now -ds nosync -t json -b '{"mailloginterval": "-1", "sendtype": "7", "prefix": "current_PAYG_Backup"}'
 "@
-$sfmblock = @"
-opcode update_central_management -s nosync -t json -b '{"cmtype":"1","___serverport":4444,"heartbeatprotocolport":"443","heartbeatprotocol":"https","centralselection":"sfm","CCCAsAppMgt":"1","chkSecureHBIC":"true","icprotocol":"https","___serverprotocol":"HTTP","adslprotocol":"https","enableccc":"yes","adslport":"443","icprotocolport":"443","cccipaddress":"$sfmip","behindadsl":"no"}'
+$backupblock2 = @"
+xgbackup=$(ls /sdisk/conf/backupdata/ | grep Backup)
+"@
+$backupblock3 = @"
+cp /sdisk/conf/backupdata/${xgbackup} /tmp/xgbackup-payg-convert
+"@
+$backupblock4 = @"
+xgbackupname="xgbackup-payg-convert"
+"@
+$backupblock5 = @"
+blobstorename="$storageaccount"
+"@
+$backupblock6 = @"
+containername="xgbackup"
+"@
+$backupblock7 = @"
+sastoken="$sastoken"
+"@
+$backupblock8 = @"
+url="https://${blobstorename}.blob.core.windows.net/${containername}/${xgbackupname}?${sastoken}"
+"@
+$backupblock9 = @"
+curl -k -X PUT -T /sdisk/conf/backupdata/$xgbackup -H "x-ms-date: $(date -u)" -H "x-ms-blob-type: BlockBlob" $url
 "@
 If ($session.Connected) {
     Start-Sleep -s 10
@@ -38,23 +53,23 @@ If ($session.Connected) {
     Start-Sleep -s 5
     $SSHStream.WriteLine("3")
     Start-Sleep -s 5
-    $SSHStream.WriteLine("$licenseblock")
+    $SSHStream.WriteLine("$backupblock1")
     Start-Sleep -s 5
-    $SSHStream.WriteLine("$sfmblock")
+    $SSHStream.WriteLine("$backupblock2")
     Start-Sleep -s 5
-    $SSHStream.WriteLine("telnet localhost zebra")
+    $SSHStream.WriteLine("$backupblock3")
     Start-Sleep -s 5
-    $SSHStream.WriteLine("enable")
+    $SSHStream.WriteLine("$backupblock4")
     Start-Sleep -s 5
-	$SSHStream.WriteLine("configure terminal")
+	$SSHStream.WriteLine("$backupblock5")
     Start-Sleep -s 5
-    $SSHStream.WriteLine("ip route 168.63.129.16/32 $portagw PortA")
+    $SSHStream.WriteLine("$backupblock6")
     Start-Sleep -s 3
-	$SSHStream.WriteLine("ip route 168.63.129.16/32 $portbgw PortB")
+	$SSHStream.WriteLine("$backupblock7")
     Start-Sleep -s 3
-	$SSHStream.WriteLine("write")
+	$SSHStream.WriteLine("$backupblock8")
     Start-Sleep -s 5
-    $SSHStream.WriteLine("reboot")
+    $SSHStream.WriteLine("$backupblock9")
     Start-Sleep -s 2
     $SSHStream.Read()  
     Remove-SSHSession -SessionId $session.SessionId > $null

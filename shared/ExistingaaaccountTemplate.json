@@ -14,23 +14,20 @@
       "name": "Posh-SSH",
       "url": "https://devopsgallerystorage.blob.core.windows.net/packages/posh-ssh.2.0.2.nupkg"
     },
-	"runbook0": {
-        "name": "XG-0-LB-postdeployment",
-        "version": "1.0.0.0",
-        "description": "This runbook configures routing for the Azure Load Balancer Standard health check on the XG nodes in the Availability Set. It also auto-activates the license",
-        "type": "PowerShell",
-				"scriptUri": "https://raw.githubusercontent.com/davidokeyode/AzureAutomationTest/master/xg-aa-xg1.ps1"
-		},
-	"runbook1": {
-			"name": "XG-1-LB-postdeployment",
-			"version": "1.0.0.0",
-			"description": "This runbook configures routing for the Azure Load Balancer Standard health check on the XG nodes in the Availability Set. It also auto-activates the license",
-			"type": "PowerShell",
-			"scriptUri": "https://raw.githubusercontent.com/davidokeyode/AzureAutomationTest/master/xg-aa-xg2.ps1"
-	},		
-	"job": {
-		"name": "Run_XG-LB-routing"
-	}
+    "runbook0": {
+      "name": "PAYG-XG-Config-Upload",
+      "version": "1.0.0.0",
+      "description": "This runbook creates a backup on the existing Sophos PAYG XG and uploads it to the Azure Blob storage",
+      "type": "PowerShell",
+      "scriptUri": "https://raw.githubusercontent.com/davidokeyode/sophos-xg-azure-custom-templates/payg-to-byol-conversion/artifacts/upload-backup-xg.ps1"
+  },
+		"runbook1": {
+				"name": "BYOL-XG-Activate-Config-Restore",
+				"version": "1.0.0.0",
+				"description": "This runbook auto-activates the license for the new BYOL Sophos XG and then restores the configuration from the PAYG XG to it",
+				"type": "PowerShell",
+				"scriptUri": "https://raw.githubusercontent.com/davidokeyode/sophos-xg-azure-custom-templates/payg-to-byol-conversion/artifacts/activate-and-restore-backup-xg.ps1"
+		}
   },
   "resources": [
     {

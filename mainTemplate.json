@@ -29,7 +29,7 @@
         },
         "vmName": {
             "type": "string",
-            "defaultValue": "XG-Firewall",
+            "defaultValue": "sophos-xg-byol-fw",
             "metadata": {
                 "description": "Name for the Virtual Machine."
             }
@@ -58,7 +58,7 @@
         },
         "vmSize": {
             "type": "string",
-            "defaultValue": "Standard_A3",
+            "defaultValue": "Standard_F2s",
             "metadata": {
                 "description": "Size of the Virtual Machine."
             }
@@ -83,7 +83,7 @@
         },
         "netName": {
             "type": "string",
-            "defaultValue": "VNET",
+            "defaultValue": "sophos-xg-byol-vnet",
             "metadata": {
                 "description": "Name of the Virtual Network."
             }
@@ -92,12 +92,12 @@
             "type": "string",
             "defaultValue": "10.0.0.0/16",
             "metadata": {
-                "description": "Prefix for the Virtual Network."
+                "description": "Prefix for the Virtual Network. Only needed for new virtual networks"
             }
         },
         "wanName": {
             "type": "string",
-            "defaultValue": "WAN",
+            "defaultValue": "sophos-xg-byol-vnet-public",
             "metadata": {
                 "description": "Name of the WAN side Subnet."
             }
@@ -106,12 +106,12 @@
             "type": "string",
             "defaultValue": "10.0.1.0/24",
             "metadata": {
-                "description": "Prefix for the WAN side Subnet."
+                "description": "Prefix for the WAN side Subnet. Only needed for new virtual networks"
             }
         },
         "lanName": {
             "type": "string",
-            "defaultValue": "LAN",
+            "defaultValue": "sophos-xg-byol-vnet-private",
             "metadata": {
                 "description": "Name of the LAN side Subnet."
             }
@@ -120,7 +120,7 @@
             "type": "string",
             "defaultValue": "10.0.2.0/24",
             "metadata": {
-                "description": "Prefix for the LAN side Subnet."
+                "description": "Prefix for the LAN side Subnet. Only needed for new virtual networks"
             }
         },
         "publicIpNewOrExisting": {
@@ -143,7 +143,7 @@
         },
         "publicIpName": {
             "type": "string",
-            "defaultValue": "PublicIP",
+            "defaultValue": "sophos-xg-byol-pip",
             "metadata": {
                 "description": "Name of the Public IP."
             }
@@ -194,14 +194,14 @@
         },
         "nicWan": {
             "type": "string",
-            "defaultValue": "PortB",
+            "defaultValue": "sophos-xg-byol-wan-nic",
             "metadata": {
                 "description": "Network Interface Name for WAN Zone"
             }
         },
         "nicLan": {
             "type": "string",
-            "defaultValue": "PortA",
+            "defaultValue": "sophos-xg-byol-lan-nic",
             "metadata": {
                 "description": "Network Interface Name for LAN Zone"
             }
@@ -219,7 +219,7 @@
         },
         "networkSecurityGroupName": {
             "type": "string",
-            "defaultValue": "SecurityGroup",
+            "defaultValue": "sophos-xg-byol-nsg",
             "metadata": {
                 "description": "Name of the Network Security Group"
             }
@@ -244,7 +244,7 @@
         },
         "availabilitySetName": {
             "type": "string",
-            "defaultValue": "AvailabilitySet",
+            "defaultValue": "sophos-xg-byol-avset",
             "metadata": {
                 "description": "Name of the Availability Set"
             }
@@ -548,17 +548,33 @@
 				"name": "[reference('SettingUpAutomationAccount').outputs.runbook0Ref.value]"
 				},
 				"parameters": {
-                    "existingxgip": "[parameters('ExistingPaygXgIpOrDns')]",
-                    "existingxgpassword": "[parameters('ExistingPaygXgAdminPassword')]",
-                    "existingxgsshport": "[parameters('ExistingPaygXgSshPort')]",
-                    "newxgpassword": "[parameters('adminPassword')]",
+                    "paygxgip": "[parameters('ExistingPaygXgIpOrDns')]",
+                    "paygxgpassword": "[parameters('ExistingPaygXgAdminPassword')]",
+                    "paygxgsshport": "[parameters('ExistingPaygXgSshPort')]",
+                    "storageaccount": "[parameters('storageName')]",
+                    "sastoken": "[reference('SettingUpStorageAccount').outputs.accountSAS.value]"
+				}
+			}
+        },
+        {
+			"name": "[concat(parameters('automationAccountName'),'/RunbookJob','-1')]",
+			"type": "Microsoft.Automation/automationAccounts/jobs",
+			"apiVersion": "2017-05-15-preview",
+			"dependsOn": [
+                "[concat('Microsoft.Resources/deployments/', 'SettingUpAutomationAccount')]",
+                "VmLoop"
+			],
+			"properties": {
+				"runbook": {
+				"name": "[reference('SettingUpAutomationAccount').outputs.runbook1Ref.value]"
+				},
+				"parameters": {
+                    "byolxghostname": "[reference('SettingUpPublicIP').outputs.fqdn.value]",
+                    "byolxgpassword": "[parameters('adminPassword')]",
+                    "byolxgsshport": "22",
                     "byollicense": "[parameters('byolLicense')]",
-					"portagw": "[concat(variables('lanNetwork'),'1')]",
-					"portbgw": "[concat(variables('wanNetwork'),'1')]",
-                    "hostname": "[reference('SettingUpPublicIP').outputs.fqdn.value]",
-                    "sastoken": "[reference('SettingUpStorageAccount').outputs.accountSAS.value]",
-                    "sshport": "2222"
-                    
+                    "storageaccount": "[parameters('storageName')]",
+					"sastoken": "[reference('SettingUpStorageAccount').outputs.accountSAS.value]"
 				}
 			}
         }
