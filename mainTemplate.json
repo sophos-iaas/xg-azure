@@ -267,7 +267,7 @@
 		},
         "devFwBlobUrlPrefix": {
             "type": "string",
-            "defaultValue": "",
+            "defaultValue": "null",
             "metadata": {
                 "description": "For development only! Specifies the blob URL prefix of a development firmware. Example: https://exampleimages.blob.core.windows.net/azi/SFAZ01_SO01.Release_17.0_CLOUD.17.00.0.007.byol"
             }
