@@ -541,7 +541,7 @@
 			"apiVersion": "2017-05-15-preview",
 			"dependsOn": [
                 "[concat('Microsoft.Resources/deployments/', 'SettingUpAutomationAccount')]",
-                "VmLoop"
+                "[concat('Microsoft.Resources/deployments/', 'SettingUpVm')]"
 			],
 			"properties": {
 				"runbook": {
@@ -562,7 +562,7 @@
 			"apiVersion": "2017-05-15-preview",
 			"dependsOn": [
                 "[concat('Microsoft.Resources/deployments/', 'SettingUpAutomationAccount')]",
-                "VmLoop"
+                "[concat('Microsoft.Resources/deployments/', 'SettingUpVm')]"
 			],
 			"properties": {
 				"runbook": {
