@@ -17,7 +17,7 @@ $secpassword = ConvertTo-SecureString $byolxgpassword -AsPlainText -Force
 $creds = New-Object System.Management.Automation.PSCredential ("admin", $secpassword)
 $session = New-SSHSession -ComputerName $byolxghostname -Credential $creds -AcceptKey -Port $byolxgsshport
 $SSHStream = New-SSHShellStream -SessionId $session.SessionId
-$url="https://$storageaccount.blob.core.windows.net/xgbackup/xgbackup-payg-convert$sastoken"
+$url="https://$storageaccount.blob.core.windows.net/xgbackup/xgbackup-payg-convert?$sastoken"
 
 $licenseblock = @"
 opcode lic_doactivate -s nosync -t json -b '{"serialkey": "$byollicense"}'

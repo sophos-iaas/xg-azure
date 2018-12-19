@@ -26,9 +26,9 @@
         "storageAccountSasProperties": {
             "type": "object",
             "defaultValue": {
-              "signedServices": "bt",
+              "signedServices": "b",
               "signedPermission": "acluw",
-              "signedExpiry": "2018-12-30T00:00:00Z",
+              "signedExpiry": "2020-12-30T00:00:00Z",
               "signedResourceTypes": "co"
             }
           }
