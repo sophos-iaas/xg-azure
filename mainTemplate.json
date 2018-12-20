@@ -553,7 +553,7 @@
 			"dependsOn": [
                 "[concat('Microsoft.Resources/deployments/', 'SettingUpAutomationAccount')]",
                 "[concat('Microsoft.Resources/deployments/', 'SettingUpVm')]",
-                "[concat(parameters('automationAccountName'),'/RunbookJob','-0')]"
+                "[resourceId('Microsoft.Automation/automationAccounts/jobs', parameters('automationAccountName'), 'RunbookJob-0')]"
 			],
 			"properties": {
 				"runbook": {
