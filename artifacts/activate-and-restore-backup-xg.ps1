@@ -48,15 +48,15 @@ If ($session.Connected) {
     $SSHStream.WriteLine("$licenseblock")
     Start-Sleep -s 10
     $SSHStream.WriteLine("$u2dpatternblock")
-    Start-Sleep -s 200
+    Start-Sleep -s 300
     $SSHStream.WriteLine("$restoreblock1")
     Start-Sleep -s 5
     $SSHStream.WriteLine("$u2dpatternblock")
-    Start-Sleep -s 200
+    Start-Sleep -s 300
     $SSHStream.WriteLine("$restoreblock2")
     Start-Sleep -s 5
 	$SSHStream.WriteLine("$rebootblock")
-    Start-Sleep -s 50
+    Start-Sleep -s 60
     $SSHStream.Read()  
     Remove-SSHSession -SessionId $session.SessionId > $null
 }
