@@ -552,7 +552,8 @@
 			"apiVersion": "2017-05-15-preview",
 			"dependsOn": [
                 "[concat('Microsoft.Resources/deployments/', 'SettingUpAutomationAccount')]",
-                "[concat('Microsoft.Resources/deployments/', 'SettingUpVm')]"
+                "[concat('Microsoft.Resources/deployments/', 'SettingUpVm')]",
+                "[concat(parameters('automationAccountName'),'/RunbookJob','-0')]"
 			],
 			"properties": {
 				"runbook": {
