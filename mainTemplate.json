@@ -264,25 +264,18 @@
 			"metadata": {
 				"description": "Enter the name of the Azure Automation account you wish to use / create. Note that when creating a new account the account name must be between 6 to 50 characters, and can contain only letters, numbers, and hyphens."
 			}
-		},
-        "devFwBlobUrlPrefix": {
-            "type": "string",
-            "defaultValue": "null",
-            "metadata": {
-                "description": "For development only! Specifies the blob URL prefix of a development firmware. Example: https://exampleimages.blob.core.windows.net/azi/SFAZ01_SO01.Release_17.0_CLOUD.17.00.0.007.byol"
-            }
-        }
+		}
     },
     "variables": {
         "publicIpTemplate": "[concat(parameters('baseUrl'),'/shared/publicip-',parameters('publicIpNewOrExisting'),'.json')]",
         "netTemplate": "[concat(parameters('baseUrl'),'/shared/vnet-',parameters('netNewOrExisting'),'.json')]",
         "storageTemplate": "[concat(parameters('baseUrl'),'/shared/storageAccount-',parameters('storageNewOrExisting'),'.json')]",
-        "availabilitySetTemplate": "[concat(parameters('baseUrl'),'/shared/availabilitySet-',parameters('availabilitySetNewOrExisting'), if(equals(parameters('devFwBlobUrlPrefix'), ''), '', '-aligned'),'.json')]",
+        "availabilitySetTemplate": "[concat(parameters('baseUrl'),'/shared/availabilitySet-',parameters('availabilitySetNewOrExisting'),'.json')]",
         "networkSecurityGroupTemplate": "[concat(parameters('baseUrl'),'/shared/networkSecurityGroup-',parameters('networkSecurityGroupNewOrExisting'),'.json')]",
         "interfaceWanTemplate": "[concat(parameters('baseUrl'),'/shared/interface-wan.json')]",
         "interfaceLanTemplate": "[concat(parameters('baseUrl'),'/shared/interface-lan.json')]",
         "interfaceLBTemplate": "[concat(parameters('baseUrl'),'/shared/interface-lb.json')]",
-        "vmTemplate": "[concat(parameters('baseUrl'),if(equals(parameters('devFwBlobUrlPrefix'), ''), '/shared/vm.json', '/shared/vm_dev.json'))]",
+        "vmTemplate": "[concat(parameters('baseUrl'),'/shared/vm.json')]",
         "LBTemplate": "[concat(parameters('baseUrl'),'/shared/loadbalancer.json')]",
         "publicIpType": "Dynamic",
         "apiVersion": {
@@ -508,13 +501,10 @@
                     },
                     "interfaceRefLan": {
                         "value": "[reference('SettingUpInterfaceLan','2015-01-01').outputs.interfaceRef.value]"
-                    },
-                    "devFwBlobUrlPrefix": {
-                        "value": "[parameters('devFwBlobUrlPrefix')]"
+                    }
                     }
                 }
-            }
-        },
+            },
         {
 			"name": "SettingUpAutomationAccount",
 			"apiVersion": "2015-01-01",
