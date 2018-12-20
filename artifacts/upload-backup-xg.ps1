@@ -33,7 +33,7 @@ If ($session.Connected) {
     $SSHStream.WriteLine("3")
     Start-Sleep -s 5
     $SSHStream.WriteLine("$backupblock1")
-    Start-Sleep -s 600
+    Start-Sleep -s 300
     $SSHStream.WriteLine("cp /sdisk/*.tar /tmp/xgbackup-payg-convert.tar")
     Start-Sleep -s 5
 	$SSHStream.WriteLine("$backupblock2")
