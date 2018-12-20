@@ -50,8 +50,9 @@ If ($session.Connected) {
     $SSHStream.WriteLine("$restoreblock1")
     Start-Sleep -s 5
     $SSHStream.WriteLine("$restoreblock2")
-    Start-Sleep -s 500
-    Start-Sleep -s 500
+    Start-Sleep -s 200
+    Start-Sleep -s 200
+    Start-Sleep -s 200
     $SSHStream.Read()  
     Remove-SSHSession -SessionId $session.SessionId > $null
 }
