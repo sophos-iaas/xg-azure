@@ -20,18 +20,18 @@
             "metadata": {
                 "Description": "Resource Group Name of the existing Storage Account"
             }
-        }
-    },
-    "variables": {
+        },
         "storageAccountSasProperties": {
             "type": "object",
             "defaultValue": {
               "signedServices": "b",
               "signedPermission": "acluw",
               "signedExpiry": "2020-12-30T00:00:00Z",
-              "signedResourceTypes": "co"
+              "signedResourceTypes": "cos"
             }
           }
+    },
+    "variables": {
     },
     "resources": [
 
@@ -47,7 +47,7 @@
         },
         "accountSAS": {
             "type": "string",
-            "value": "[listAccountSas(parameters('storageAccountName'), '2018-02-01', variables('storageAccountSasProperties')).accountSasToken]"
+            "value": "[listAccountSas(parameters('storageAccountName'), '2018-02-01', parameters('storageAccountSasProperties')).accountSasToken]"
         }
     }
 }
