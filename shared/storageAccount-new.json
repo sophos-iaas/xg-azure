@@ -21,21 +21,43 @@
             "metadata": {
                 "Description": "Resource Group Name of the existing Storage Account"
             }
-        }
+        },
+        "storageAccountSasProperties": {
+            "type": "object",
+            "defaultValue": {
+              "signedServices": "b",
+              "signedPermission": "acluw",
+              "signedExpiry": "2020-12-30T00:00:00Z",
+              "signedResourceTypes": "cos"
+            }
+          }
+    },
+    "variables": {
+        "backupContainerName": "xgbackup"
     },
     "resources": [
         {
             "type": "Microsoft.Storage/storageAccounts",
             "name": "[concat(parameters('storageAccountName'))]",
-            "apiVersion": "2016-01-01",
+            "apiVersion": "2018-02-01",
             "location": "[resourceGroup().location]",
             "properties": {
-
             },
+            "kind": "Storage",
             "sku": {
                 "name": "[parameters('storageAccountType')]"
             },
-            "kind": "Storage"
+            "resources": [
+                {
+                    "name": "[concat('default/', variables('backupContainerName'))]",
+                    "type": "blobServices/containers",
+                    "apiVersion": "2018-03-01-preview",
+                    "dependsOn": [
+                        "[parameters('storageAccountName')]"
+                    ]
+                }
+            ]
+            
         }
     ],
     "outputs": {
@@ -46,6 +68,10 @@
         "storageAccountEndpoint": {
             "value": "[reference(concat('Microsoft.Storage/storageAccounts/', parameters('storageAccountName')), '2016-01-01').primaryEndpoints.blob]",
             "type": "string"
+        },
+        "accountSAS": {
+            "type": "string",
+            "value": "[listAccountSas(parameters('storageAccountName'), '2018-02-01', parameters('storageAccountSasProperties')).accountSasToken]"
         }
     }
 }

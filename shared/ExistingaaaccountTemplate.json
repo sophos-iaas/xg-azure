@@ -1,0 +1,89 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0",
+  "parameters": {
+    "accountName": {
+      "type": "string"
+    },
+    "accountLocation": {
+      "type": "string"
+    }
+  },
+  "variables": {
+  	"psmodule": {
+      "name": "Posh-SSH",
+      "url": "https://devopsgallerystorage.blob.core.windows.net/packages/posh-ssh.2.0.2.nupkg"
+    },
+    "runbook0": {
+      "name": "PAYG-XG-Config-Upload",
+      "version": "1.0.0.0",
+      "description": "This runbook creates a backup on the existing Sophos PAYG XG and uploads it to the Azure Blob storage",
+      "type": "PowerShell",
+      "scriptUri": "https://raw.githubusercontent.com/davidokeyode/sophos-xg-azure-custom-templates/payg-to-byol-conversion/artifacts/upload-backup-xg.ps1"
+  },
+		"runbook1": {
+				"name": "BYOL-XG-Activate-Config-Restore",
+				"version": "1.0.0.0",
+				"description": "This runbook auto-activates the license for the new BYOL Sophos XG and then restores the configuration from the PAYG XG to it",
+				"type": "PowerShell",
+				"scriptUri": "https://raw.githubusercontent.com/davidokeyode/sophos-xg-azure-custom-templates/payg-to-byol-conversion/artifacts/activate-and-restore-backup-xg.ps1"
+		}
+  },
+  "resources": [
+    {
+	 "name": "[concat(parameters('accountName'), '/', variables('psmodule').name)]",
+	 "type": "Microsoft.Automation/automationAccounts/modules",
+	 "apiVersion": "2015-10-31",
+	 "tags": {},
+	 "properties": {
+	   "contentLink": {
+		 "uri": "[variables('psmodule').url]"
+		}	
+	 }
+	},
+	{
+	 "name": "[concat(parameters('accountName'), '/', variables('runbook0').name)]",
+	 "type": "Microsoft.Automation/automationAccounts/runbooks",
+	 "apiVersion": "2015-10-31",
+	 "location": "[parameters('accountLocation')]",
+	 "tags": {},
+	 "properties": {
+	   "runbookType": "[variables('runbook0').type]",
+	   "logProgress": "false",
+	   "logVerbose": "false",
+	   "description": "[variables('runbook0').description]",
+	   "publishContentLink": {
+		 "uri": "[variables('runbook0').scriptUri]",
+		 "version": "[variables('runbook0').version]"
+		}
+	 }
+	},
+	{
+		"name": "[concat(parameters('accountName'), '/', variables('runbook1').name)]",
+		"type": "Microsoft.Automation/automationAccounts/runbooks",
+		"apiVersion": "2015-10-31",
+		"location": "[parameters('accountLocation')]",
+		"tags": {},
+		"properties": {
+			"runbookType": "[variables('runbook1').type]",
+			"logProgress": "false",
+			"logVerbose": "false",
+			"description": "[variables('runbook1').description]",
+			"publishContentLink": {
+			"uri": "[variables('runbook1').scriptUri]",
+			"version": "[variables('runbook1').version]"
+		 }
+		}
+	 }
+  ],
+  "outputs": {
+		"runbook0Ref": {
+            "value": "[variables('runbook0').name]",
+            "type": "string"
+				},
+		"runbook1Ref": {
+					"value": "[variables('runbook0').name]",
+					"type": "string"
+			}	
+	}
+}

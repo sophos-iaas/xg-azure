@@ -1,45 +1,111 @@
 {
-    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
-    "contentVersion": "1.0.0.0",
-    "parameters": {
-        "vmName": {
-            "value": "XG-Firewall"
-        },
-        "adminPassword": {
-            "value": "insertYourPasswordHere"
-        },
-        "vmSize": {
-            "value": "Standard_A3"
-        },
-        "netName": {
-            "value": "VNET"
-        },
-        "netPrefix": {
-            "value": "10.0.0.0/16"
-        },
-        "wanName": {
-            "value": "WAN"
-        },
-        "wanPrefix": {
-            "value": "10.0.1.0/24"
-        },
-        "lanName": {
-            "value": "LAN"
-        },
-        "lanPrefix": {
-            "value": "10.0.2.0/24"
-        },
-        "storageName": {
-            "value": "xgazure"
-        },
-        "storageType": {
-            "value": "Standard_LRS"
-        },
-        "imageSku": {
-            "value": "byol"
-        },
-        "publicIpDNS": {
-            "value": "sfostest6"
-        }
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "baseUrl": {
+      "value": "https://raw.githubusercontent.com/davidokeyode/sophos-xg-azure-custom-templates/payg-to-byol-conversion"
+    },
+    "ExistingPaygXgIpOrDns": {
+      "value": ""
+    },
+    "ExistingPaygXgAdminPassword": {
+      "value": ""
+    },
+    "ExistingPaygXgSshPort": {
+      "value": ""
+    },
+    "vmName": {
+      "value": ""
+    },
+    "adminPassword": {
+      "value": ""
+    },
+    "imageSku": {
+      "value": "byol"
+    },
+    "byolLicense": {
+      "value": ""
+    },
+    "vmSize": {
+      "value": "Standard_D2_v2"
+    },
+    "netNewOrExisting": {
+      "value": "existing"
+    },
+    "netRG": {
+      "value": ""
+    },
+    "netName": {
+      "value": ""
+    },
+    "netPrefix": {
+      "value": ""
+    },
+    "wanName": {
+      "value": ""
+    },
+    "wanPrefix": {
+      "value": ""
+    },
+    "lanName": {
+      "value": ""
+    },
+    "lanPrefix": {
+      "value": ""
+    },
+    "publicIpNewOrExisting": {
+      "value": ""
+    },
+    "publicIpRG": {
+      "value": ""
+    },
+    "publicIpName": {
+      "value": ""
+    },
+    "publicIpDNS": {
+      "value": ""
+    },
+    "storageNewOrExisting": {
+      "value": ""
+    },
+    "storageRG": {
+      "value": ""
+    },
+    "storageName": {
+      "value": ""
+    },
+    "storageType": {
+      "value": "Standard_LRS"
+    },
+    "location": {
+      "value": "[resourceGroup().Location]"
+    },
+    "nicWan": {
+      "value": ""
+    },
+    "nicLan": {
+      "value": ""
+    },
+    "networkSecurityGroupNewOrExisting": {
+      "value": ""
+    },
+    "networkSecurityGroupName": {
+      "value": ""
+    },
+    "trustedNetwork": {
+      "value": "*"
+    },
+    "availabilitySetNewOrExisting": {
+      "value": ""
+    },
+    "availabilitySetName": {
+      "value": ""
+    },
+    "automationAccountNewOrExisting": {
+      "value": ""
+    },
+    "automationAccountName": {
+      "value": ""
     }
+  }
 }
