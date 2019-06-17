@@ -60,7 +60,7 @@ end
 
 def create_resource_group(location, id)
   group_name = "dev-#{id}"
-  status = system("azure group create --location #{location} #{group_name}")
+  status = system("az group create --location #{location} --name #{group_name}")
 
   exit(1) if status == false
 
@@ -69,7 +69,7 @@ end
 
 def run(resource_group)
   check_template_dir_file_exists('mainTemplate.json')
-  system("azure group deployment create -f mainTemplate.json -e #{$GENERATED_PARAMS_FILE} -g #{resource_group} --verbose")
+  system("az group deployment create --template-file mainTemplate.json --parameters @#{$GENERATED_PARAMS_FILE} --resource-group #{resource_group} --verbose")
 end
 
 usage if ARGV.length != 2
