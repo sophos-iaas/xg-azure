@@ -72,7 +72,7 @@
                             "Standard_F8s_v2",
                             "Standard_F16s_v2",
                             "Standard_F32s_v2",
-							"Standard_F64s_v2"
+			    "Standard_F64s_v2"
                         ],
                         "constraints": {
                             "excludedSizes": [
