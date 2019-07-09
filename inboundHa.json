@@ -507,6 +507,7 @@
                 "count": "[parameters('numberOfInstances')]"
             },
             "dependsOn": [
+                "[if(equals(copyIndex(), 0), concat('Microsoft.Resources/deployments/', 'SettingUpAvailabilitySet'), concat('Microsoft.Resources/deployments/','SettingUpVm',sub(copyIndex(), 1) ))]",
                 "[concat('Microsoft.Resources/deployments/', 'SettingUpInterfaceWan', copyIndex())]",
                 "[concat('Microsoft.Resources/deployments/', 'SettingUpInterfaceLan', copyIndex())]",
                 "[concat('Microsoft.Resources/deployments/', 'SettingUpStorageAccount')]",
