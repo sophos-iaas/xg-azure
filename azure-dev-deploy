@@ -28,8 +28,8 @@ def usage
   puts 'IMAGE_PREFIX:   URL prefix of the image to use in the Azure cloud storage.'
   puts
   puts 'Example: '
-  puts "#{$PROGRAM_NAME} westeurope https://sophosnsgimages.blob.core.windows.net/azi/SFAZ01_SO01.Release_Develop_CLOUD.17.01.1.266.payg"
-  puts
+  puts "#{$PROGRAM_NAME} westeurope https://sophosnsgimages.blob.core.windows.net/azi/SFAZ01_SO01.Release_Develop_CLOUD.17.01.1.266.payg ha myprefix"
+  puts "#{$PROGRAM_NAME} eastus https://sophosnsgimages.blob.core.windows.net/azi/SFAZ01_SO01.Release_Develop_CLOUD.17.01.1.266.payg other myprefix"
   puts "All instances are deployed with admin password '#{$ADMIN_PASSWORD}'"
 
   exit(1)
@@ -43,13 +43,13 @@ def check_template_dir_file_exists(filename)
   end
 end
 
-def generate_parameters_file(image_prefix, id)
+def generate_parameters_file(image_prefix, id, rg_prefix)
   str = File.read($PARAMS_FILE)
   data = JSON.parse(str)
 
   data['parameters']['adminPassword']['value'] = $ADMIN_PASSWORD
-  data['parameters']['storageName']['value'] = "xgazure#{id}"
-  data['parameters']['publicIpDNS']['value'] = "sfostest-#{id}"
+  data['parameters']['storageName']['value'] = "xgazure#{rg_prefix}#{id}"
+  data['parameters']['publicIpDNS']['value'] = "sfostest-#{rg_prefix}#{id}"
   data['parameters']['devFwBlobUrlPrefix'] = {}
   data['parameters']['devFwBlobUrlPrefix']['value'] = image_prefix
 
@@ -58,27 +58,32 @@ def generate_parameters_file(image_prefix, id)
   end
 end
 
-def create_resource_group(location, id)
-  group_name = "dev-#{id}"
-  status = system("azure group create --location #{location} #{group_name}")
+def create_resource_group(location, id, rg_prefix)
+  group_name= "#{rg_prefix}-#{id}"
+  status = system("az group create --location #{location} --name #{group_name}")
 
   exit(1) if status == false
 
   group_name
 end
 
-def run(resource_group)
-  check_template_dir_file_exists('mainTemplate.json')
-  system("azure group deployment create -f mainTemplate.json -e #{$GENERATED_PARAMS_FILE} -g #{resource_group} --verbose")
+def run(resource_group, template)
+  check_template_dir_file_exists(template)
+  system("az group deployment create --template-file #{template} --parameters @#{$GENERATED_PARAMS_FILE} --resource-group #{resource_group} --verbose")
 end
 
-usage if ARGV.length != 2
+usage if ARGV.length < 2 || ARGV.length > 4
 
 location = ARGV[0]
 image_prefix = ARGV[1]
 
 id = SecureRandom.hex(3)
+template = 'mainTemplate.json'
+template = 'inboundHa.json' if ARGV.length >= 3 && ARGV[2] == 'ha'
 
-generate_parameters_file(image_prefix, id)
-resource_group = create_resource_group(location, id)
-run(resource_group)
+rg_prefix = 'dev'
+rg_prefix = ARGV[3] if ARGV.length == 4
+
+generate_parameters_file(image_prefix, id, rg_prefix)
+resource_group = create_resource_group(location, id, rg_prefix)
+run(resource_group, template)

@@ -252,7 +252,7 @@
         "interfaceWanTemplate": "[concat(parameters('baseUrl'),'/shared/interface-wan.json')]",
         "interfaceLanTemplate": "[concat(parameters('baseUrl'),'/shared/interface-lan.json')]",
         "interfaceLBTemplate": "[concat(parameters('baseUrl'),'/shared/interface-lb.json')]",
-        "vmTemplate": "[concat(parameters('baseUrl'),'/shared/vm.json')]",
+        "vmTemplate": "[concat(parameters('baseUrl'),if(equals(parameters('devFwBlobUrlPrefix'), ''), '/shared/vm.json', '/shared/vm_dev.json'))]",
         "LBTemplate": "[concat(parameters('baseUrl'),'/shared/loadbalancer.json')]",
         "securityRuleAllowHTTPTemplate": "[concat(parameters('baseUrl'),'/shared/inboundSecurityRuleAllowHttp.json')]",
         "publicIpType": "Dynamic",
@@ -507,6 +507,7 @@
                 "count": "[parameters('numberOfInstances')]"
             },
             "dependsOn": [
+                "[if(equals(copyIndex(), 0), concat('Microsoft.Resources/deployments/', 'SettingUpAvailabilitySet'), concat('Microsoft.Resources/deployments/','SettingUpVm',sub(copyIndex(), 1) ))]",
                 "[concat('Microsoft.Resources/deployments/', 'SettingUpInterfaceWan', copyIndex())]",
                 "[concat('Microsoft.Resources/deployments/', 'SettingUpInterfaceLan', copyIndex())]",
                 "[concat('Microsoft.Resources/deployments/', 'SettingUpStorageAccount')]",
