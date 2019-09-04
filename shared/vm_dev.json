@@ -28,6 +28,9 @@
         },
         "devFwBlobUrlPrefix": {
             "type": "string"
+        },
+        "location":{
+            "type": "string"
         }
     },
     "variables": {
@@ -42,7 +45,7 @@
             "apiVersion": "2017-03-30",
             "type": "Microsoft.Compute/images",
             "name": "disks",
-            "location": "[resourceGroup().location]",
+            "location": "[parameters('location')]",
             "properties": {
                 "storageProfile": {
                     "osDisk": {
@@ -65,7 +68,7 @@
             "apiVersion": "2017-03-30",
             "type": "Microsoft.Compute/virtualMachines",
             "name": "[parameters('vmName')]",
-            "location": "[resourceGroup().location]",
+            "location": "[parameters('location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Compute/images/', 'disks')]"
             ],

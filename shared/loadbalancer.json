@@ -10,6 +10,9 @@
         },
         "numberOfInstances": {
             "type": "int"
+        },
+        "location":{
+            "type": "string"
         }
     },
     "variables": {
@@ -28,7 +31,7 @@
             "apiVersion": "2016-03-30",
             "name": "[parameters('loadBalancerName')]",
             "type": "Microsoft.Network/loadBalancers",
-            "location": "[resourceGroup().location]",
+            "location": "[parameters('location')]",
             "properties": {
                 "frontendIPConfigurations": [
                     {
@@ -84,7 +87,7 @@
             "apiVersion": "2016-03-30",
             "name": "[concat(parameters('loadBalancerName'), '/', variables('inboundNatName'), '-', copyIndex())]",
             "type": "Microsoft.Network/loadBalancers/inboundNatRules",
-            "location": "[resourceGroup().location]",
+            "location": "[parameters('location')]",
             "copy": {
                 "name": "inboundNatLoop",
                 "count": "[parameters('numberOfInstances')]"

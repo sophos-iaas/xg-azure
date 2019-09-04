@@ -28,6 +28,9 @@
         },
         "devFwBlobUrlPrefix": {
             "type": "string"
+        },
+        "location":{
+            "type": "string"
         }
     },
     "variables": {
@@ -47,7 +50,7 @@
                 "product": "[variables('imageOffer')]",
                 "name": "[parameters('imageSku')]"
             },
-            "location": "[resourceGroup().location]",
+            "location": "[parameters('location')]",
             "properties": {
                 "availabilitySet": {
                     "id": "[parameters('availabilitySetId')]"

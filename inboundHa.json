@@ -276,6 +276,9 @@
                 "parameters": {
                     "availabilitySetName": {
                         "value": "[parameters('availabilitySetName')]"
+                    },
+                    "location": {
+                        "value": "[parameters('location')]"
                     }
                 }
             }
@@ -299,6 +302,9 @@
                     },
                     "storageAccountExistingRG": {
                         "value": "[parameters('storageRG')]"
+                    },
+                    "location": {
+                        "value": "[parameters('location')]"
                     }
                 }
             }
@@ -319,6 +325,9 @@
                     },
                     "trustedNetwork": {
                         "value": "[parameters('trustedNetwork')]"
+                    },
+                    "location": {
+                        "value": "[parameters('location')]"
                     }
                 }
             }
@@ -342,6 +351,9 @@
                     },
                     "trustedNetwork": {
                         "value": "*"
+                    },
+                    "location": {
+                        "value": "[parameters('location')]"
                     }
                 }
             }
@@ -368,6 +380,9 @@
                     },
                     "publicIpRGName": {
                         "value": "[parameters('publicIpRG')]"
+                    },
+                    "location": {
+                        "value": "[parameters('location')]"
                     }
                 }
             }
@@ -403,6 +418,9 @@
                     },
                     "vnetExistingRGName": {
                         "value": "[parameters('netRG')]"
+                    },
+                    "location": {
+                        "value": "[parameters('location')]"
                     }
                 }
             }
@@ -429,6 +447,9 @@
                     },
                     "numberOfInstances": {
                         "value": "[parameters('numberOfInstances')]"
+                    },
+                    "location": {
+                        "value": "[parameters('location')]"
                     }
                 }
             }
@@ -467,6 +488,9 @@
                     },
                     "networkSecurityGroupId": {
                         "value": "[reference('SettingUpNetworkSecurityGroup','2015-01-01').outputs.networkSecurityGroupName.value]"
+                    },
+                    "location": {
+                        "value": "[parameters('location')]"
                     }
                 }
             }
@@ -494,6 +518,9 @@
                     },
                     "subnetRef": {
                         "value": "[reference('SettingUpVirtualNetwork','2015-01-01').outputs.subnet2Ref.value]"
+                    },
+                    "location": {
+                        "value": "[parameters('location')]"
                     }
                 }
             }
@@ -546,6 +573,9 @@
                     },
                     "interfaceRefLan": {
                         "value": "[reference(concat('SettingUpInterfaceLan', copyIndex()),'2015-01-01').outputs.interfaceRef.value]"
+                    },
+                    "location": {
+                        "value": "[parameters('location')]"
                     }
                 }
             }

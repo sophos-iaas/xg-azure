@@ -13,6 +13,9 @@
         },
         "networkSecurityGroupId": {
             "type": "string"
+        },
+        "location":{
+            "type": "string"
         }
     },
     "resources": [
@@ -20,7 +23,7 @@
             "apiVersion": "2016-03-30",
             "type": "Microsoft.Network/networkInterfaces",
             "name": "[parameters('interfaceName')]",
-            "location": "[resourceGroup().location]",
+            "location": "[parameters('location')]",
             "properties": {
                 "networkSecurityGroup": {
                     "id": "[parameters('networkSecurityGroupId')]"
