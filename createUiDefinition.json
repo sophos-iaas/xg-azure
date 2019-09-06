@@ -200,8 +200,7 @@
             "publicIpDNS": "[steps('instanceDetails').domainSpec.domainNameLabel]",
             "publicIpName": "[steps('instanceDetails').domainSpec.name]",
             "publicIpNewOrExisting": "[steps('instanceDetails').domainSpec.newOrExistingOrNone]",
-            "publicIpRG": "[steps('instanceDetails').domainSpec.resourceGroup]",
-            "location": "[location()]"
+            "publicIpRG": "[steps('instanceDetails').domainSpec.resourceGroup]"
         }
     }
 }

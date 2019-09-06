@@ -162,13 +162,6 @@
                 "description": "Replication mode for Storage Account."
             }
         },
-        "location": {
-            "type": "string",
-            "defaultValue": "[resourceGroup().Location]",
-            "metadata": {
-                "description": "Geo-Location you want to deploy to."
-            }
-        },
         "nicWan": {
             "type": "string",
             "defaultValue": "PortB",
@@ -260,7 +253,8 @@
             "resources": {
                 "deployments": "2016-02-01"
             }
-        }
+        },
+        "location": "[resourceGroup().Location]"
     },
     "resources": [
         {
@@ -278,7 +272,7 @@
                         "value": "[parameters('availabilitySetName')]"
                     },
                     "location": {
-                        "value": "[parameters('location')]"
+                        "value": "[variables('location')]"
                     }
                 }
             }
@@ -304,7 +298,7 @@
                         "value": "[parameters('storageRG')]"
                     },
                     "location": {
-                        "value": "[parameters('location')]"
+                        "value": "[variables('location')]"
                     }
                 }
             }
@@ -327,7 +321,7 @@
                         "value": "[parameters('trustedNetwork')]"
                     },
                     "location": {
-                        "value": "[parameters('location')]"
+                        "value": "[variables('location')]"
                     }
                 }
             }
@@ -353,7 +347,7 @@
                         "value": "*"
                     },
                     "location": {
-                        "value": "[parameters('location')]"
+                        "value": "[variables('location')]"
                     }
                 }
             }
@@ -382,7 +376,7 @@
                         "value": "[parameters('publicIpRG')]"
                     },
                     "location": {
-                        "value": "[parameters('location')]"
+                        "value": "[variables('location')]"
                     }
                 }
             }
@@ -420,7 +414,7 @@
                         "value": "[parameters('netRG')]"
                     },
                     "location": {
-                        "value": "[parameters('location')]"
+                        "value": "[variables('location')]"
                     }
                 }
             }
@@ -449,7 +443,7 @@
                         "value": "[parameters('numberOfInstances')]"
                     },
                     "location": {
-                        "value": "[parameters('location')]"
+                        "value": "[variables('location')]"
                     }
                 }
             }
@@ -490,7 +484,7 @@
                         "value": "[reference('SettingUpNetworkSecurityGroup','2015-01-01').outputs.networkSecurityGroupName.value]"
                     },
                     "location": {
-                        "value": "[parameters('location')]"
+                        "value": "[variables('location')]"
                     }
                 }
             }
@@ -520,7 +514,7 @@
                         "value": "[reference('SettingUpVirtualNetwork','2015-01-01').outputs.subnet2Ref.value]"
                     },
                     "location": {
-                        "value": "[parameters('location')]"
+                        "value": "[variables('location')]"
                     }
                 }
             }
@@ -575,7 +569,7 @@
                         "value": "[reference(concat('SettingUpInterfaceLan', copyIndex()),'2015-01-01').outputs.interfaceRef.value]"
                     },
                     "location": {
-                        "value": "[parameters('location')]"
+                        "value": "[variables('location')]"
                     }
                 }
             }

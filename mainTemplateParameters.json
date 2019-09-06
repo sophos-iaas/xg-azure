@@ -5,7 +5,10 @@
         "vmName": {
             "value": "XG-Firewall"
         },
-        "adminPassword": {
+        "baseUrl":{
+	    "value": "https://verdidevimages.blob.core.windows.net/dev-template/xg-azure-location"
+	},	
+	"adminPassword": {
             "value": "insertYourPasswordHere"
         },
         "vmSize": {
