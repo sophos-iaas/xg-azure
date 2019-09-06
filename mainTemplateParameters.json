@@ -5,7 +5,7 @@
         "vmName": {
             "value": "XG-Firewall"
         },
-	"adminPassword": {
+        "adminPassword": {
             "value": "insertYourPasswordHere"
         },
         "vmSize": {
