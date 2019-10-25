@@ -2,12 +2,19 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "baseUrl": {
-            "type": "string",
-            "defaultValue": "https://raw.githubusercontent.com/sophos-iaas/xg-azure/master",
-            "metadata": {
-                "artifactsBaseUrl": "Base URL of the template package"
-            }
+        "_artifactsLocation": {
+          "type": "string",
+          "metadata": {
+              "description": "The base URI where artifacts required by this template are located including a trailing '/'"
+          },
+          "defaultValue": "[deployment().properties.templateLink.uri]"
+        },
+        "_artifactsLocationSasToken": {
+          "type": "securestring",
+          "metadata": {
+              "description": "The sasToken required to access _artifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated. Use the defaultValue if the staging location is not secured."
+          },
+          "defaultValue": ""
         },
         "vmName": {
             "type": "string",
@@ -53,7 +60,7 @@
         },
         "netRG": {
             "type": "string",
-            "defaultValue": "",
+            "defaultValue": "[resourceGroup().name]",
             "metadata": {
                 "description": "Resource Group of existing Virtual Network (optional)."
             }
@@ -113,7 +120,7 @@
         },
         "publicIpRG": {
             "type": "string",
-            "defaultValue": "",
+            "defaultValue": "[resourceGroup().name]",
             "metadata": {
                 "description": "Resource Group of existing Public IP (optional)."
             }
@@ -144,7 +151,7 @@
         },
         "storageRG": {
             "type": "string",
-            "defaultValue": "",
+            "defaultValue": "[resourceGroup().name]",
             "metadata": {
                 "description": "Resource Group of existing Storage Account (optional)."
             }
@@ -219,27 +226,24 @@
                 "description": "Name of the Availability Set"
             }
         },
-        "devFwBlobUrlPrefix": {
+        "location": {
             "type": "string",
-            "defaultValue": "",
+            "defaultValue": "[resourceGroup().location]",
             "metadata": {
-                "description": "For development only! Specifies the blob URL prefix of a development firmware. Example: https://exampleimages.blob.core.windows.net/azi/SFAZ01_SO01.Release_17.0_CLOUD.17.00.0.007.byol"
+                "description": "Location to deploy. Default to use the same location as the Resource Group"
             }
-        }
+        } 
     },
     "variables": {
-        "publicIpTemplate": "[concat(parameters('baseUrl'),'/shared/publicip-',parameters('publicIpNewOrExisting'),'.json')]",
-        "netTemplate": "[concat(parameters('baseUrl'),'/shared/vnet-',parameters('netNewOrExisting'),'.json')]",
-        "storageTemplate": "[concat(parameters('baseUrl'),'/shared/storageAccount-',parameters('storageNewOrExisting'),'.json')]",
-        "availabilitySetTemplate": "[concat(parameters('baseUrl'),'/shared/availabilitySet-',parameters('availabilitySetNewOrExisting'),'.json')]",
-        "networkSecurityGroupTemplate": "[concat(parameters('baseUrl'),'/shared/networkSecurityGroup-',parameters('networkSecurityGroupNewOrExisting'),'.json')]",
-        "interfaceWanTemplate": "[concat(parameters('baseUrl'),'/shared/interface-wan.json')]",
-        "interfaceLanTemplate": "[concat(parameters('baseUrl'),'/shared/interface-lan.json')]",
-        "interfaceLBTemplate": "[concat(parameters('baseUrl'),'/shared/interface-lb.json')]",
-        "vmTemplate": "[concat(parameters('baseUrl'),if(equals(parameters('devFwBlobUrlPrefix'), ''), '/shared/vm.json', '/shared/vm_dev.json'))]",
-        "LBTemplate": "[concat(parameters('baseUrl'),'/shared/loadbalancer.json')]",
-        "publicIpType": "Dynamic",
-        "location": "[resourceGroup().Location]"
+        "publicIpTemplate": "[concat(parameters('_artifactsLocation'),'nestedtemplates/publicip-new.json', parameters('_artifactsLocationSasToken'))]",
+        "netTemplate": "[concat(parameters('_artifactsLocation'),'nestedtemplates/vnet-new.json', parameters('_artifactsLocationSasToken'))]",
+        "storageTemplate": "[concat(parameters('_artifactsLocation'),'nestedtemplates/storageAccount-new.json', parameters('_artifactsLocationSasToken'))]",
+        "availabilitySetTemplate": "[concat(parameters('_artifactsLocation'),'nestedtemplates/availabilitySet-new.json', parameters('_artifactsLocationSasToken'))]",
+        "networkSecurityGroupTemplate": "[concat(parameters('_artifactsLocation'),'nestedtemplates/networkSecurityGroup-new.json', parameters('_artifactsLocationSasToken'))]",
+        "interfaceWanTemplate": "[concat(parameters('_artifactsLocation'),'nestedtemplates/interface-wan.json', parameters('_artifactsLocationSasToken'))]",
+        "interfaceLanTemplate": "[concat(parameters('_artifactsLocation'),'nestedtemplates/interface-lan.json', parameters('_artifactsLocationSasToken'))]",
+        "vmTemplate": "[concat(parameters('_artifactsLocation'),'nestedtemplates/vm.json', parameters('_artifactsLocationSasToken'))]",
+        "publicIpType": "Dynamic"
     },
     "resources": [
         {
@@ -278,9 +282,6 @@
                     },
                     "storageAccountType": {
                         "value": "[parameters('storageType')]"
-                    },
-                    "storageAccountExistingRG": {
-                        "value": "[parameters('storageRG')]"
                     },
                     "location": {
                         "value": "[variables('location')]"
@@ -331,9 +332,6 @@
                     "dnsPrefix": {
                         "value": "[parameters('publicIpDNS')]"
                     },
-                    "publicIpRGName": {
-                        "value": "[parameters('publicIpRG')]"
-                    },
                     "location": {
                         "value": "[variables('location')]"
                     }
@@ -368,9 +366,6 @@
                     },
                     "Subnet2Prefix": {
                         "value": "[parameters('lanPrefix')]"
-                    },
-                    "vnetExistingRGName": {
-                        "value": "[parameters('netRG')]"
                     },
                     "location": {
                         "value": "[variables('location')]"
@@ -478,9 +473,6 @@
                     },
                     "interfaceRefLan": {
                         "value": "[reference('SettingUpInterfaceLan','2019-08-01').outputs.interfaceRef.value]"
-                    },
-                    "devFwBlobUrlPrefix": {
-                        "value": "[parameters('devFwBlobUrlPrefix')]"
                     },
                     "location": {
                         "value": "[variables('location')]"

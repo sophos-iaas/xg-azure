@@ -20,10 +20,6 @@
         "Subnet2Prefix": {
             "type": "string"
         },
-        "vnetExistingRGName": {
-            "type": "string",
-            "defaultValue": ""
-        },
         "location":{
             "type": "string"
         }

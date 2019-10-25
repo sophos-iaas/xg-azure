@@ -1,6 +1,7 @@
 {
+    "$schema": "https://schema.management.azure.com/schemas/0.1.2-preview/CreateUIDefinition.MultiVm.json#",
     "handler": "Microsoft.Compute.MultiVm",
-    "version": "0.0.1-preview",
+    "version": "0.1.2-preview",
     "parameters": {
         "basics": [
             {
@@ -200,7 +201,8 @@
             "publicIpDNS": "[steps('instanceDetails').domainSpec.domainNameLabel]",
             "publicIpName": "[steps('instanceDetails').domainSpec.name]",
             "publicIpNewOrExisting": "[steps('instanceDetails').domainSpec.newOrExistingOrNone]",
-            "publicIpRG": "[steps('instanceDetails').domainSpec.resourceGroup]"
+            "publicIpRG": "[steps('instanceDetails').domainSpec.resourceGroup]",
+            "location": "[location()]"
         }
     }
 }

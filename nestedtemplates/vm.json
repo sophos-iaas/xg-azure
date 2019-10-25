@@ -26,9 +26,6 @@
         "interfaceRefLan": {
             "type": "string"
         },
-        "devFwBlobUrlPrefix": {
-            "type": "string"
-        },
         "location":{
             "type": "string"
         }
