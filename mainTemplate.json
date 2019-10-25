@@ -239,18 +239,13 @@
         "vmTemplate": "[concat(parameters('baseUrl'),if(equals(parameters('devFwBlobUrlPrefix'), ''), '/shared/vm.json', '/shared/vm_dev.json'))]",
         "LBTemplate": "[concat(parameters('baseUrl'),'/shared/loadbalancer.json')]",
         "publicIpType": "Dynamic",
-        "apiVersion": {
-            "resources": {
-                "deployments": "2016-02-01"
-            }
-        },
         "location": "[resourceGroup().Location]"
     },
     "resources": [
         {
             "name": "SettingUpAvailabilitySet",
             "type": "Microsoft.Resources/deployments",
-            "apiVersion": "[variables('apiVersion').resources.deployments]",
+            "apiVersion": "2019-05-01",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
@@ -270,7 +265,7 @@
         {
             "name": "SettingUpStorageAccount",
             "type": "Microsoft.Resources/deployments",
-            "apiVersion": "[variables('apiVersion').resources.deployments]",
+            "apiVersion": "2019-05-01",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
@@ -296,7 +291,7 @@
         {
             "name": "SettingUpNetworkSecurityGroup",
             "type": "Microsoft.Resources/deployments",
-            "apiVersion": "[variables('apiVersion').resources.deployments]",
+            "apiVersion": "2019-05-01",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
@@ -319,7 +314,7 @@
         {
             "name": "SettingUpPublicIP",
             "type": "Microsoft.Resources/deployments",
-            "apiVersion": "[variables('apiVersion').resources.deployments]",
+            "apiVersion": "2019-05-01",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
@@ -348,7 +343,7 @@
         {
             "name": "SettingUpVirtualNetwork",
             "type": "Microsoft.Resources/deployments",
-            "apiVersion": "[variables('apiVersion').resources.deployments]",
+            "apiVersion": "2019-05-01",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
@@ -386,7 +381,7 @@
         {
             "name": "SettingUpInterfaceWan",
             "type": "Microsoft.Resources/deployments",
-            "apiVersion": "[variables('apiVersion').resources.deployments]",
+            "apiVersion": "2019-05-01",
             "dependsOn": [
                 "[concat('Microsoft.Resources/deployments/', 'SettingUpPublicIP')]",
                 "[concat('Microsoft.Resources/deployments/', 'SettingUpVirtualNetwork')]",
@@ -403,13 +398,13 @@
                         "value": "[parameters('nicWan')]"
                     },
                     "subnetRef": {
-                        "value": "[reference('SettingUpVirtualNetwork','2015-01-01').outputs.subnet1Ref.value]"
+                        "value": "[reference('SettingUpVirtualNetwork','2019-08-01').outputs.subnet1Ref.value]"
                     },
                     "publicIpId": {
                         "value": "[reference('SettingUpPublicIP').outputs.publicIpId.value]"
                     },
                     "networkSecurityGroupId": {
-                        "value": "[reference('SettingUpNetworkSecurityGroup','2015-01-01').outputs.networkSecurityGroupName.value]"
+                        "value": "[reference('SettingUpNetworkSecurityGroup','2019-08-01').outputs.networkSecurityGroupName.value]"
                     },
                     "location": {
                         "value": "[variables('location')]"
@@ -420,7 +415,7 @@
         {
             "name": "SettingUpInterfaceLan",
             "type": "Microsoft.Resources/deployments",
-            "apiVersion": "[variables('apiVersion').resources.deployments]",
+            "apiVersion": "2019-05-01",
             "dependsOn": [
                 "[concat('Microsoft.Resources/deployments/', 'SettingUpVirtualNetwork')]"
             ],
@@ -435,7 +430,7 @@
                         "value": "[parameters('nicLan')]"
                     },
                     "subnetRef": {
-                        "value": "[reference('SettingUpVirtualNetwork','2015-01-01').outputs.subnet2Ref.value]"
+                        "value": "[reference('SettingUpVirtualNetwork','2019-08-01').outputs.subnet2Ref.value]"
                     },
                     "location": {
                         "value": "[variables('location')]"
@@ -446,7 +441,7 @@
         {
             "name": "SettingUpVm",
             "type": "Microsoft.Resources/deployments",
-            "apiVersion": "[variables('apiVersion').resources.deployments]",
+            "apiVersion": "2019-05-01",
             "dependsOn": [
                 "[concat('Microsoft.Resources/deployments/', 'SettingUpInterfaceWan')]",
                 "[concat('Microsoft.Resources/deployments/', 'SettingUpInterfaceLan')]",
@@ -479,10 +474,10 @@
                         "value": "[reference('SettingUpStorageAccount').outputs.storageAccountEndpoint.value]"
                     },
                     "interfaceRefWan": {
-                        "value": "[reference('SettingUpInterfaceWan','2015-01-01').outputs.interfaceRef.value]"
+                        "value": "[reference('SettingUpInterfaceWan','2019-08-01').outputs.interfaceRef.value]"
                     },
                     "interfaceRefLan": {
-                        "value": "[reference('SettingUpInterfaceLan','2015-01-01').outputs.interfaceRef.value]"
+                        "value": "[reference('SettingUpInterfaceLan','2019-08-01').outputs.interfaceRef.value]"
                     },
                     "devFwBlobUrlPrefix": {
                         "value": "[parameters('devFwBlobUrlPrefix')]"

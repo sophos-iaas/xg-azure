@@ -16,7 +16,7 @@
         {
             "type": "Microsoft.Compute/availabilitySets",
             "name": "[parameters('availabilitySetName')]",
-            "apiVersion": "2017-03-30",
+            "apiVersion": "2019-07-01",
             "location": "[parameters('location')]",
             "properties": {
                 "platformFaultDomainCount": "[if(contains(variables('regionsDomain3'), parameters('location')), 3, 2)]"
