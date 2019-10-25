@@ -232,7 +232,7 @@
             "metadata": {
                 "description": "Location to deploy. Default to use the same location as the Resource Group"
             }
-        } 
+        }
     },
     "variables": {
         "publicIpTemplate": "[concat(parameters('_artifactsLocation'),'nestedtemplates/publicip-new.json', parameters('_artifactsLocationSasToken'))]",
@@ -243,13 +243,29 @@
         "interfaceWanTemplate": "[concat(parameters('_artifactsLocation'),'nestedtemplates/interface-wan.json', parameters('_artifactsLocationSasToken'))]",
         "interfaceLanTemplate": "[concat(parameters('_artifactsLocation'),'nestedtemplates/interface-lan.json', parameters('_artifactsLocationSasToken'))]",
         "vmTemplate": "[concat(parameters('_artifactsLocation'),'nestedtemplates/vm.json', parameters('_artifactsLocationSasToken'))]",
-        "publicIpType": "Dynamic"
+        "publicIpType": "Dynamic",
+        "storageAccountId": "[resourceId(parameters('storageRG'), 'Microsoft.Storage/storageAccounts/', parameters('storageName'))]",
+        "PubIpId": "[resourceId(parameters('publicIpRG'),'Microsoft.Network/publicIPAddresses',parameters('publicIpName'))]"
     },
     "resources": [
+        {
+            "apiVersion": "2019-05-01",
+            "name": "pid-26ed137c-6fc4-561a-8230-7e65ac1591ba",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "resources": []
+                }
+            }
+        },
         {
             "name": "SettingUpAvailabilitySet",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-05-01",
+            "condition": "[equals(parameters('availabilitySetNewOrExisting'), 'new')]",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
@@ -261,7 +277,7 @@
                         "value": "[parameters('availabilitySetName')]"
                     },
                     "location": {
-                        "value": "[variables('location')]"
+                        "value": "[parameters('location')]"
                     }
                 }
             }
@@ -270,6 +286,7 @@
             "name": "SettingUpStorageAccount",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-05-01",
+            "condition": "[equals(parameters('storageNewOrExisting'), 'new')]",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
@@ -284,7 +301,7 @@
                         "value": "[parameters('storageType')]"
                     },
                     "location": {
-                        "value": "[variables('location')]"
+                        "value": "[parameters('location')]"
                     }
                 }
             }
@@ -293,6 +310,7 @@
             "name": "SettingUpNetworkSecurityGroup",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-05-01",
+            "condition": "[equals(parameters('networkSecurityGroupNewOrExisting'), 'new')]",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
@@ -307,7 +325,7 @@
                         "value": "[parameters('trustedNetwork')]"
                     },
                     "location": {
-                        "value": "[variables('location')]"
+                        "value": "[parameters('location')]"
                     }
                 }
             }
@@ -316,6 +334,7 @@
             "name": "SettingUpPublicIP",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-05-01",
+            "condition": "[equals(parameters('publicIpNewOrExisting'), 'new')]",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
@@ -333,7 +352,7 @@
                         "value": "[parameters('publicIpDNS')]"
                     },
                     "location": {
-                        "value": "[variables('location')]"
+                        "value": "[parameters('location')]"
                     }
                 }
             }
@@ -342,6 +361,7 @@
             "name": "SettingUpVirtualNetwork",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-05-01",
+            "condition": "[equals(parameters('netNewOrExisting'), 'new')]",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
@@ -368,7 +388,7 @@
                         "value": "[parameters('lanPrefix')]"
                     },
                     "location": {
-                        "value": "[variables('location')]"
+                        "value": "[parameters('location')]"
                     }
                 }
             }
@@ -393,16 +413,16 @@
                         "value": "[parameters('nicWan')]"
                     },
                     "subnetRef": {
-                        "value": "[reference('SettingUpVirtualNetwork','2019-08-01').outputs.subnet1Ref.value]"
+                        "value": "[resourceId(parameters('netRG'),'Microsoft.Network/virtualNetworks/subnets',parameters('netName'), parameters('wanName'))]"
                     },
                     "publicIpId": {
-                        "value": "[reference('SettingUpPublicIP').outputs.publicIpId.value]"
+                        "value": "[resourceId(parameters('publicIpRG'), 'Microsoft.Network/publicIPAddresses', parameters('publicIpName'))]"
                     },
                     "networkSecurityGroupId": {
-                        "value": "[reference('SettingUpNetworkSecurityGroup','2019-08-01').outputs.networkSecurityGroupName.value]"
+                        "value": "[resourceId('Microsoft.Compute/networkSecurityGroups',parameters('networkSecurityGroupName'))]"
                     },
                     "location": {
-                        "value": "[variables('location')]"
+                        "value": "[parameters('location')]"
                     }
                 }
             }
@@ -425,10 +445,10 @@
                         "value": "[parameters('nicLan')]"
                     },
                     "subnetRef": {
-                        "value": "[reference('SettingUpVirtualNetwork','2019-08-01').outputs.subnet2Ref.value]"
+                        "value": "[resourceId(parameters('netRG'),'Microsoft.Network/virtualNetworks/subnets',parameters('netName'), parameters('lanName'))]"
                     },
                     "location": {
-                        "value": "[variables('location')]"
+                        "value": "[parameters('location')]"
                     }
                 }
             }
@@ -463,10 +483,10 @@
                         "value": "[parameters('imageSku')]"
                     },
                     "availabilitySetId": {
-                        "value": "[reference('SettingUpAvailabilitySet').outputs.availabilitySetId.value]"
+                        "value": "[resourceId('Microsoft.Compute/availabilitySets',parameters('availabilitySetName'))]"
                     },
                     "storageAccountEndpoint": {
-                        "value": "[reference('SettingUpStorageAccount').outputs.storageAccountEndpoint.value]"
+                        "value": "[if(equals(parameters('storageNewOrExisting'), 'new'), reference('SettingUpStorageAccount').outputs.storageAccountEndpoint.value, reference(variables('storageAccountId'), '2019-06-01').primaryEndpoints.blob)]"
                     },
                     "interfaceRefWan": {
                         "value": "[reference('SettingUpInterfaceWan','2019-08-01').outputs.interfaceRef.value]"
@@ -475,7 +495,7 @@
                         "value": "[reference('SettingUpInterfaceLan','2019-08-01').outputs.interfaceRef.value]"
                     },
                     "location": {
-                        "value": "[variables('location')]"
+                        "value": "[parameters('location')]"
                     }
                 }
             }
@@ -483,7 +503,7 @@
     ],
     "outputs": {
         "fqdn": {
-            "value": "[reference('SettingUpPublicIP').outputs.fqdn.value]",
+            "value": "[if(equals(parameters('publicIpNewOrExisting'), 'new'),reference('SettingUpPublicIP').outputs.fqdn.value, reference(variables('PubIpId'), '2019-08-01').dnsSettings.fqdn)]",
             "type": "string"
         }
     }

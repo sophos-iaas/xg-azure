@@ -33,9 +33,7 @@
     "variables": {
         "imagePublisher": "sophos",
         "imageOffer": "sophos-xg",
-        "adminUsername": "azureuser",
-        "sshKeyPath": "[concat('/home/',variables('adminUsername'),'/.ssh/authorized_keys')]",
-        "vhdContainer": "vhds"
+        "adminUsername": "azureuser"
     },
     "resources": [
         {

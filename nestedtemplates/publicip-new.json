@@ -31,11 +31,11 @@
     ],
     "outputs": {
         "publicIpId": {
-            "value": "[resourceId(concat('Microsoft.Network','/','publicIPAddresses'),parameters('publicIPAddressName'))]",
+            "value": "[resourceId('Microsoft.Network/publicIPAddresses',parameters('publicIPAddressName'))]",
             "type": "string"
         },
         "fqdn": {
-            "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses',parameters('publicIPAddressName')),'2016-06-01').dnsSettings.fqdn]",
+            "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses',parameters('publicIPAddressName')),'2019-08-01').dnsSettings.fqdn]",
             "type": "string"
         }
     }
