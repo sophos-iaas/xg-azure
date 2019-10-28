@@ -34,11 +34,7 @@
         }
     },
     "variables": {
-        "imagePublisher": "sophos",
-        "imageOffer": "sophos-xg",
-        "adminUsername": "azureuser",
-        "sshKeyPath": "[concat('/home/',variables('adminUsername'),'/.ssh/authorized_keys')]",
-        "vhdContainer": "vhds"
+        "adminUsername": "azureuser"
     },
     "resources": [
        {
@@ -86,7 +82,8 @@
                 },
                 "storageProfile": {
                     "imageReference": {
-                        "id": "[resourceId('Microsoft.Compute/images/', 'disks')]"
+                        "id": "[resourceId('Microsoft.Compute/images/', 'disks')]",
+                        "version": "latest"
                     },
                     "dataDisks": [
                         {
@@ -125,5 +122,11 @@
                 }
             }
         }
-    ]
+    ],
+    "outputs": {
+        "unused": {
+            "value": "[parameters('imageSku')]",
+            "type": "string"
+        }
+    }
 }
