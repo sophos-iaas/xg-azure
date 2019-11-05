@@ -28,6 +28,9 @@
         },
         "location":{
             "type": "string"
+        },
+        "devFwBlobUrlPrefix": {
+            "type": "string"
         }
     },
     "variables": {
@@ -103,7 +106,7 @@
                 "diagnosticsProfile": {
                     "bootDiagnostics": {
                         "enabled": "true",
-                        "storageUri": "[parameters('storageAccountEndpoint')]"
+                        "storageUri": "[concat(take(parameters('devFwBlobUrlPrefix'),0), parameters('storageAccountEndpoint'))]"
                     }
                 }
             }

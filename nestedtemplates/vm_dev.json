@@ -57,7 +57,8 @@
                         "lun": 0,
                         "storageAccountType": "Standard_LRS"
                     }]
-                }
+                },
+                "hyperVGeneration": "V1"
             }
         },
         {
@@ -82,8 +83,7 @@
                 },
                 "storageProfile": {
                     "imageReference": {
-                        "id": "[resourceId('Microsoft.Compute/images/', 'disks')]",
-                        "version": "latest"
+                        "id": "[resourceId('Microsoft.Compute/images/', 'disks')]"
                     },
                     "dataDisks": [
                         {
@@ -117,16 +117,10 @@
                 "diagnosticsProfile": {
                     "bootDiagnostics": {
                         "enabled": "true",
-                        "storageUri": "[parameters('storageAccountEndpoint')]"
+                        "storageUri": "[concat(take(parameters('imageSku'),0), parameters('storageAccountEndpoint'))]"
                     }
                 }
             }
         }
-    ],
-    "outputs": {
-        "unused": {
-            "value": "[parameters('imageSku')]",
-            "type": "string"
-        }
-    }
+    ]
 }
