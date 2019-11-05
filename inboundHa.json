@@ -1,0 +1,592 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "_artifactsLocation": {
+          "type": "string",
+          "metadata": {
+              "description": "The base URI where artifacts required by this template are located including a trailing '/'"
+          },
+          "defaultValue": "[deployment().properties.templateLink.uri]"
+        },
+        "_artifactsLocationSasToken": {
+          "type": "securestring",
+          "metadata": {
+              "description": "The sasToken required to access _artifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated. Use the defaultValue if the staging location is not secured."
+          },
+          "defaultValue": ""
+        },
+        "vmName": {
+            "type": "string",
+            "defaultValue": "XG-Firewall",
+            "metadata": {
+                "description": "Name for the Virtual Machine."
+            }
+        },
+        "adminPassword": {
+            "type": "securestring",
+            "metadata": {
+                "description": "Password for the Virtual Machine."
+            }
+        },
+        "imageSku": {
+            "type": "string",
+            "defaultValue": "byol",
+            "allowedValues": [
+                "byol",
+                "payg-new"
+            ],
+            "metadata": {
+                "description": "License type to use."
+            }
+        },
+        "vmSize": {
+            "type": "string",
+            "defaultValue": "Standard_F2s_v2",
+            "metadata": {
+                "description": "Size of the Virtual Machine."
+            }
+        },
+        "netNewOrExisting": {
+            "type": "string",
+            "defaultValue": "new",
+            "allowedValues": [
+                "new",
+                "existing"
+            ],
+            "metadata": {
+                "description": "Create new Virtual Network or use an existing one."
+            }
+        },
+        "netRG": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().name]",
+            "metadata": {
+                "description": "Resource Group of existing Virtual Network (optional)."
+            }
+        },
+        "netName": {
+            "type": "string",
+            "defaultValue": "VNET",
+            "metadata": {
+                "description": "Name of the Virtual Network."
+            }
+        },
+        "netPrefix": {
+            "type": "string",
+            "defaultValue": "10.0.0.0/16",
+            "metadata": {
+                "description": "Prefix for the Virtual Network."
+            }
+        },
+        "wanName": {
+            "type": "string",
+            "defaultValue": "WAN",
+            "metadata": {
+                "description": "Name of the WAN side Subnet."
+            }
+        },
+        "wanPrefix": {
+            "type": "string",
+            "defaultValue": "10.0.1.0/24",
+            "metadata": {
+                "description": "Prefix for the WAN side Subnet."
+            }
+        },
+        "lanName": {
+            "type": "string",
+            "defaultValue": "LAN",
+            "metadata": {
+                "description": "Name of the LAN side Subnet."
+            }
+        },
+        "lanPrefix": {
+            "type": "string",
+            "defaultValue": "10.0.2.0/24",
+            "metadata": {
+                "description": "Prefix for the LAN side Subnet."
+            }
+        },
+        "publicIpNewOrExisting": {
+            "type": "string",
+            "defaultValue": "new",
+            "allowedValues": [
+                "new",
+                "existing"
+            ],
+            "metadata": {
+                "description": "Create new Public IP or use an existing one."
+            }
+        },
+        "publicIpRG": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().name]",
+            "metadata": {
+                "description": "Resource Group of existing Public IP (optional)."
+            }
+        },
+        "publicIpName": {
+            "type": "string",
+            "defaultValue": "PublicIP",
+            "metadata": {
+                "description": "Name of the Public IP."
+            }
+        },
+        "publicIpDNS": {
+            "type": "string",
+            "metadata": {
+                "description": "Unique DNS name prefix for Public IP."
+            }
+        },
+        "storageNewOrExisting": {
+            "type": "string",
+            "defaultValue": "new",
+            "allowedValues": [
+                "new",
+                "existing"
+            ],
+            "metadata": {
+                "description": "Create new Storage Account or use an existing one."
+            }
+        },
+        "storageRG": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().name]",
+            "metadata": {
+                "description": "Resource Group of existing Storage Account (optional)."
+            }
+        },
+        "storageName": {
+            "type": "string",
+            "metadata": {
+                "description": "Unique name for Storage Account."
+            }
+        },
+        "storageType": {
+            "type": "string",
+            "defaultValue": "Standard_LRS",
+            "metadata": {
+                "description": "Replication mode for Storage Account."
+            }
+        },
+        "nicWan": {
+            "type": "string",
+            "defaultValue": "PortB",
+            "metadata": {
+                "description": "Network Interface Name for WAN Zone"
+            }
+        },
+        "nicLan": {
+            "type": "string",
+            "defaultValue": "PortA",
+            "metadata": {
+                "description": "Network Interface Name for LAN Zone"
+            }
+        },
+        "networkSecurityGroupNewOrExisting": {
+            "type": "string",
+            "defaultValue": "new",
+            "allowedValues": [
+                "new",
+                "existing"
+            ],
+            "metadata": {
+                "description": "Create new Network Security Group or use an existing one."
+            }
+        },
+        "networkSecurityGroupName": {
+            "type": "string",
+            "defaultValue": "SecurityGroup",
+            "metadata": {
+                "description": "Name of the Network Security Group"
+            }
+        },
+        "trustedNetwork": {
+            "type": "string",
+            "defaultValue": "*",
+            "metadata": {
+                "description": "Trusted network for admin access. Using * will allow traffic from everywhere; using a CIDR notation, e.g., 203.0.113.0/24, will only allow traffic from that network range."
+            }
+        },
+        "availabilitySetNewOrExisting": {
+            "type": "string",
+            "defaultValue": "new",
+            "allowedValues": [
+                "new",
+                "existing"
+            ],
+            "metadata": {
+                "description": "Create new Availability Set or use an existing one."
+            }
+        },
+        "availabilitySetName": {
+            "type": "string",
+            "defaultValue": "AvailabilitySet",
+            "metadata": {
+                "description": "Name of the Availability Set"
+            }
+        },
+        "numberOfInstances": {
+            "type": "int",
+            "defaultValue": 2,
+            "allowedValues": [
+                0,1,2,3,4,5
+            ],
+            "metadata": {
+                "description": "Number of XG Firewall instances to be deployed."
+            }
+        },
+        "location": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]",
+            "metadata": {
+                "description": "Location to deploy. Default to use the same location as the Resource Group"
+            }
+        }
+    },
+    "variables": {
+        "publicIpTemplate": "[concat(parameters('_artifactsLocation'),'nestedtemplates/publicip-new.json', parameters('_artifactsLocationSasToken'))]",
+        "netTemplate": "[concat(parameters('_artifactsLocation'),'nestedtemplates/vnet-new.json', parameters('_artifactsLocationSasToken'))]",
+        "storageTemplate": "[concat(parameters('_artifactsLocation'),'nestedtemplates/storageAccount-new.json', parameters('_artifactsLocationSasToken'))]",
+        "availabilitySetTemplate": "[concat(parameters('_artifactsLocation'),'nestedtemplates/availabilitySet-new.json', parameters('_artifactsLocationSasToken'))]",
+        "networkSecurityGroupTemplate": "[concat(parameters('_artifactsLocation'),'nestedtemplates/networkSecurityGroup-new.json', parameters('_artifactsLocationSasToken'))]",
+        "interfaceLanTemplate": "[concat(parameters('_artifactsLocation'),'nestedtemplates/interface-lan.json', parameters('_artifactsLocationSasToken'))]",
+        "interfaceLBTemplate": "[concat(parameters('_artifactsLocation'),'nestedtemplates/interface-lb.json', parameters('_artifactsLocationSasToken'))]",
+        "vmTemplate": "[concat(parameters('_artifactsLocation'),'nestedtemplates/vm.json', parameters('_artifactsLocationSasToken'))]",
+        "LBTemplate": "[concat(parameters('_artifactsLocation'),'nestedtemplates/loadbalancer.json', parameters('_artifactsLocationSasToken'))]",
+        "securityRuleAllowHTTPTemplate": "[concat(parameters('_artifactsLocation'),'nestedtemplates/inboundSecurityRuleAllowHttp.json', parameters('_artifactsLocationSasToken'))]",
+        "publicIpType": "Dynamic",
+        "storageAccountId": "[resourceId(parameters('storageRG'), 'Microsoft.Storage/storageAccounts/', parameters('storageName'))]",
+        "PubIpId": "[resourceId(parameters('publicIpRG'),'Microsoft.Network/publicIPAddresses',parameters('publicIpName'))]"
+    },
+    "resources": [
+        {
+            "apiVersion": "2019-05-01",
+            "name": "pid-26ed137c-6fc4-561a-8230-7e65ac1591ba",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "resources": []
+                }
+            }
+        },
+        {
+            "name": "SettingUpAvailabilitySet",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-05-01",
+            "condition": "[equals(parameters('availabilitySetNewOrExisting'), 'new')]",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('availabilitySetTemplate')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "availabilitySetName": {
+                        "value": "[parameters('availabilitySetName')]"
+                    },
+                    "location": {
+                        "value": "[parameters('location')]"
+                    }
+                }
+            }
+        },
+        {
+            "name": "SettingUpStorageAccount",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-05-01",
+            "condition": "[equals(parameters('storageNewOrExisting'), 'new')]",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('storageTemplate')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "storageAccountName": {
+                        "value": "[parameters('storageName')]"
+                    },
+                    "storageAccountType": {
+                        "value": "[parameters('storageType')]"
+                    },
+                    "location": {
+                        "value": "[parameters('location')]"
+                    }
+                }
+            }
+        },
+        {
+            "name": "SettingUpNetworkSecurityGroup",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-05-01",
+            "condition": "[equals(parameters('networkSecurityGroupNewOrExisting'), 'new')]",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('networkSecurityGroupTemplate')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "networkSecurityGroupName": {
+                        "value": "[parameters('networkSecurityGroupName')]"
+                    },
+                    "trustedNetwork": {
+                        "value": "[parameters('trustedNetwork')]"
+                    },
+                    "location": {
+                        "value": "[parameters('location')]"
+                    }
+                }
+            }
+        },
+        {
+            "name": "SettingUpSecurityRuleAllowHTTP",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-05-01",
+            "dependsOn": [
+                "[concat('Microsoft.Resources/deployments/', 'SettingUpNetworkSecurityGroup')]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('securityRuleAllowHTTPTemplate')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "networkSecurityGroupName": {
+                        "value": "[parameters('networkSecurityGroupName')]"
+                    },
+                    "trustedNetwork": {
+                        "value": "*"
+                    },
+                    "location": {
+                        "value": "[parameters('location')]"
+                    }
+                }
+            }
+        },
+        {
+            "name": "SettingUpPublicIP",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-05-01",
+            "condition": "[equals(parameters('publicIpNewOrExisting'), 'new')]",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('publicIpTemplate')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "publicIPAddressName": {
+                        "value": "[parameters('publicIpName')]"
+                    },
+                    "publicIPAddressType": {
+                        "value": "[variables('publicIpType')]"
+                    },
+                    "dnsPrefix": {
+                        "value": "[parameters('publicIpDNS')]"
+                    },
+                    "location": {
+                        "value": "[parameters('location')]"
+                    }
+                }
+            }
+        },
+        {
+            "name": "SettingUpVirtualNetwork",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-05-01",
+            "condition": "[equals(parameters('netNewOrExisting'), 'new')]",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('netTemplate')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "virtualNetworkName": {
+                        "value": "[parameters('netName')]"
+                    },
+                    "virtualNetworkAddressPrefix": {
+                        "value": "[parameters('netPrefix')]"
+                    },
+                    "Subnet1Name": {
+                        "value": "[parameters('wanName')]"
+                    },
+                    "Subnet1Prefix": {
+                        "value": "[parameters('wanPrefix')]"
+                    },
+                    "Subnet2Name": {
+                        "value": "[parameters('lanName')]"
+                    },
+                    "Subnet2Prefix": {
+                        "value": "[parameters('lanPrefix')]"
+                    },
+                    "location": {
+                        "value": "[parameters('location')]"
+                    }
+                }
+            }
+        },
+        {
+            "name": "SettingUpLoadbalancer",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-05-01",
+            "dependsOn": [
+                "[concat('Microsoft.Resources/deployments/', 'SettingUpPublicIP')]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('LBTemplate')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "publicIpId": {
+                        "value": "[variables('PubIpId')]"
+                    },
+                    "loadBalancerName": {
+                        "value": "Loadbalancer"
+                    },
+                    "numberOfInstances": {
+                        "value": "[parameters('numberOfInstances')]"
+                    },
+                    "location": {
+                        "value": "[parameters('location')]"
+                    }
+                }
+            }
+        },
+        {
+            "name": "[concat('SettingUpInterfaceWan', copyIndex())]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-05-01",
+            "copy": {
+                "name": "InterfaceWanLoop",
+                "count": "[parameters('numberOfInstances')]"
+            },
+            "dependsOn": [
+                "[concat('Microsoft.Resources/deployments/', 'SettingUpLoadbalancer')]",
+                "[concat('Microsoft.Resources/deployments/', 'SettingUpVirtualNetwork')]",
+                "[concat('Microsoft.Resources/deployments/', 'SettingUpNetworkSecurityGroup')]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('interfaceLBTemplate')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "interfaceName": {
+                        "value": "[concat(parameters('nicWan'),'-', copyIndex())]"
+                    },
+                    "subnetRef": {
+                        "value": "[resourceId(parameters('netRG'),'Microsoft.Network/virtualNetworks/subnets',parameters('netName'), parameters('wanName'))]"
+                    },
+                    "lbBackendID": {
+                        "value": "[reference('SettingUpLoadbalancer').outputs.lbBackendID.value]"
+                    },
+                    "inboundNatID": {
+                        "value": "[concat(reference('SettingUpLoadbalancer').outputs.inboundNatIDPrefix.value, copyIndex())]"
+                    },
+                    "networkSecurityGroupId": {
+                        "value": "[resourceId('Microsoft.Compute/networkSecurityGroups',parameters('networkSecurityGroupName'))]"
+                    },
+                    "location": {
+                        "value": "[parameters('location')]"
+                    }
+                }
+            }
+        },
+        {
+            "name": "[concat('SettingUpInterfaceLan', copyIndex())]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-05-01",
+            "copy": {
+                "name": "InterfaceLanLoop",
+                "count": "[parameters('numberOfInstances')]"
+            },
+            "dependsOn": [
+                "[concat('Microsoft.Resources/deployments/', 'SettingUpVirtualNetwork')]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('interfaceLanTemplate')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "interfaceName": {
+                        "value": "[concat(parameters('nicLan'),'-', copyIndex())]"
+                    },
+                    "subnetRef": {
+                        "value": "[resourceId(parameters('netRG'),'Microsoft.Network/virtualNetworks/subnets',parameters('netName'), parameters('lanName'))]"
+                    },
+                    "location": {
+                        "value": "[parameters('location')]"
+                    }
+                }
+            }
+        },
+        {
+            "name": "[concat('SettingUpVm', copyIndex())]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-05-01",
+            "copy": {
+                "name": "VmLoop",
+                "count": "[parameters('numberOfInstances')]"
+            },
+            "dependsOn": [
+                "[concat('Microsoft.Resources/deployments/', 'SettingUpInterfaceWan', copyIndex())]",
+                "[concat('Microsoft.Resources/deployments/', 'SettingUpInterfaceLan', copyIndex())]",
+                "[concat('Microsoft.Resources/deployments/', 'SettingUpStorageAccount')]",
+                "[concat('Microsoft.Resources/deployments/', 'SettingUpAvailabilitySet')]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('vmTemplate')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "vmName": {
+                        "value": "[concat(parameters('vmName'),'-', copyIndex())]"
+                    },
+                    "vmSize": {
+                        "value": "[parameters('vmSize')]"
+                    },
+                    "adminPassword": {
+                        "value": "[parameters('adminPassword')]"
+                    },
+                    "imageSku": {
+                        "value": "[parameters('imageSku')]"
+                    },
+                    "availabilitySetId": {
+                        "value": "[resourceId('Microsoft.Compute/availabilitySets',parameters('availabilitySetName'))]"
+                    },
+                    "storageAccountEndpoint": {
+                        "value": "[if(equals(parameters('storageNewOrExisting'), 'new'), reference('SettingUpStorageAccount').outputs.storageAccountEndpoint.value, reference(variables('storageAccountId'), '2019-06-01').primaryEndpoints.blob)]"
+                    },
+                    "interfaceRefWan": {
+                        "value": "[reference(concat('SettingUpInterfaceWan', copyIndex()),'2019-08-01').outputs.interfaceRef.value]"
+                    },
+                    "interfaceRefLan": {
+                        "value": "[reference(concat('SettingUpInterfaceLan', copyIndex()),'2019-08-01').outputs.interfaceRef.value]"
+                    },
+                    "location": {
+                        "value": "[parameters('location')]"
+                    }
+                }
+            }
+        }
+    ],
+    "outputs": {
+        "fqdn": {
+            "value": "[if(equals(parameters('publicIpNewOrExisting'), 'new'),reference('SettingUpPublicIP').outputs.fqdn.value, reference(variables('PubIpId'), '2019-08-01').dnsSettings.fqdn)]",
+            "type": "string"
+        }
+    }
+}

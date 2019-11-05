@@ -2,44 +2,41 @@
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "vmName": {
-            "value": "XG-Firewall"
+        "_artifactsLocation": {
+            "value": "https://verdidevimages.blob.core.windows.net/dev-template/github-xg-std-ha/"
+        },
+        "vmSIze": {
+            "value": "Standard_F2s_v2"
         },
         "adminPassword": {
             "value": "insertYourPasswordHere"
         },
-        "vmSize": {
-            "value": "Standard_A3"
-        },
-        "netName": {
-            "value": "VNET"
-        },
-        "netPrefix": {
-            "value": "10.0.0.0/16"
-        },
-        "wanName": {
-            "value": "WAN"
-        },
-        "wanPrefix": {
-            "value": "10.0.1.0/24"
-        },
-        "lanName": {
-            "value": "LAN"
-        },
-        "lanPrefix": {
-            "value": "10.0.2.0/24"
-        },
-        "storageName": {
-            "value": "xgazure"
-        },
-        "storageType": {
-            "value": "Standard_LRS"
-        },
         "imageSku": {
             "value": "byol"
         },
+        "trustedNetwork": {
+            "value": "207.35.29.0/24"
+        },
         "publicIpDNS": {
             "value": "sfostest6"
+        },        
+        "availabilitySetNewOrExisting": {
+            "value": "new"
+        },
+        "storageNewOrExisting": {
+            "value": "new"
+        },
+        "publicIpNewOrExisting": {
+            "value": "new"
+        },
+        "networkSecurityGroupNewOrExisting": {
+            "value": "new"
+        },
+        "networkSecurityGroupName": {
+            "value": "RainNSG"
+        },
+        "netNewOrExisting": {
+            "value": "new"
         }
     }
 }
