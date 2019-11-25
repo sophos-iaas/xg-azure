@@ -24,7 +24,7 @@
         "lbFrontendID": "[resourceId('Microsoft.Network/loadBalancers/frontendIPConfigurations',parameters('loadBalancerName'), variables('lbFrontendName'))]",
         "lbBackendID": "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools',parameters('loadBalancerName'), variables('lbBackendName'))]",
         "lbProbeID": "[resourceId('Microsoft.Network/loadBalancers/probes',parameters('loadBalancerName'), variables('probeName'))]",
-        "inboundNatIDPrefix": "[concat(variables('lbID'),'/inboundNatRules/',variables('inboundNatName'),'-')]"
+        "inboundNatIDPrefix": "[resourceId('Microsoft.Network/loadBalancers/inboundNatRules', parameters('loadBalancerName'), variables('inboundNatName'))]"
     },
     "resources": [
         {

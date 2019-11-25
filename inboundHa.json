@@ -138,6 +138,17 @@
                 "description": "Unique DNS name prefix for Public IP."
             }
         },
+        "publicIpType": {
+            "type": "string",
+            "allowedValues": [
+                "Dynamic",
+                "Static"
+            ],            
+            "defaultValue": "Dynamic",
+            "metadata": {
+                "description": "Allocation method of the public ip of the VM"
+            }
+        },
         "storageNewOrExisting": {
             "type": "string",
             "defaultValue": "new",
@@ -252,18 +263,17 @@
         }
     },
     "variables": {
-        "publicIpTemplate": "[concat(parameters('_artifactsLocation'),'nestedtemplates/publicip-new.json', parameters('_artifactsLocationSasToken'))]",
-        "netTemplate": "[concat(parameters('_artifactsLocation'),'nestedtemplates/vnet-new.json', parameters('_artifactsLocationSasToken'))]",
-        "storageTemplate": "[concat(parameters('_artifactsLocation'),'nestedtemplates/storageAccount-new.json', parameters('_artifactsLocationSasToken'))]",
-        "availabilitySetTemplate": "[concat(parameters('_artifactsLocation'),'nestedtemplates/availabilitySet-new.json', parameters('_artifactsLocationSasToken'))]",
-        "networkSecurityGroupTemplate": "[concat(parameters('_artifactsLocation'),'nestedtemplates/networkSecurityGroup-new.json', parameters('_artifactsLocationSasToken'))]",
-        "interfaceLanTemplate": "[concat(parameters('_artifactsLocation'),'nestedtemplates/interface-lan.json', parameters('_artifactsLocationSasToken'))]",
-        "interfaceLBTemplate": "[concat(parameters('_artifactsLocation'),'nestedtemplates/interface-lb.json', parameters('_artifactsLocationSasToken'))]",
-        "vmTemplate": "[concat(parameters('_artifactsLocation'),'nestedtemplates/vm.json', parameters('_artifactsLocationSasToken'))]",
-        "vmDevTemplate": "[concat(parameters('_artifactsLocation'),'nestedtemplates/vm_dev.json', parameters('_artifactsLocationSasToken'))]",
-        "LBTemplate": "[concat(parameters('_artifactsLocation'),'nestedtemplates/loadbalancer.json', parameters('_artifactsLocationSasToken'))]",
-        "securityRuleAllowHTTPTemplate": "[concat(parameters('_artifactsLocation'),'nestedtemplates/inboundSecurityRuleAllowHttp.json', parameters('_artifactsLocationSasToken'))]",
-        "publicIpType": "Dynamic",
+        "publicIpTemplate": "[uri(parameters('_artifactsLocation'), concat('nestedtemplates/publicip-new.json', parameters('_artifactsLocationSasToken')))]",
+        "netTemplate": "[uri(parameters('_artifactsLocation'), concat('nestedtemplates/vnet-new.json', parameters('_artifactsLocationSasToken')))]",
+        "storageTemplate": "[uri(parameters('_artifactsLocation'), concat('nestedtemplates/storageAccount-new.json', parameters('_artifactsLocationSasToken')))]",
+        "availabilitySetTemplate": "[uri(parameters('_artifactsLocation'), concat('nestedtemplates/availabilitySet-new.json', parameters('_artifactsLocationSasToken')))]",
+        "networkSecurityGroupTemplate": "[uri(parameters('_artifactsLocation'), concat('nestedtemplates/networkSecurityGroup-new.json', parameters('_artifactsLocationSasToken')))]",
+        "interfaceLanTemplate": "[uri(parameters('_artifactsLocation'), concat('nestedtemplates/interface-lan.json', parameters('_artifactsLocationSasToken')))]",
+        "interfaceLBTemplate": "[uri(parameters('_artifactsLocation'), concat('nestedtemplates/interface-lb.json', parameters('_artifactsLocationSasToken')))]",
+        "vmTemplate": "[uri(parameters('_artifactsLocation'), concat('nestedtemplates/vm.json', parameters('_artifactsLocationSasToken')))]",
+        "vmDevTemplate": "[uri(parameters('_artifactsLocation'), concat('nestedtemplates/vm_dev.json', parameters('_artifactsLocationSasToken')))]",
+        "LBTemplate": "[uri(parameters('_artifactsLocation'), concat('nestedtemplates/loadbalancer.json', parameters('_artifactsLocationSasToken')))]",
+        "securityRuleAllowHTTPTemplate": "[uri(parameters('_artifactsLocation'), concat('nestedtemplates/inboundSecurityRuleAllowHttp.json', parameters('_artifactsLocationSasToken')))]",
         "storageAccountId": "[resourceId(parameters('storageRG'), 'Microsoft.Storage/storageAccounts/', parameters('storageName'))]",
         "PubIpId": "[resourceId(parameters('publicIpRG'),'Microsoft.Network/publicIPAddresses',parameters('publicIpName'))]"
     },
@@ -392,7 +402,7 @@
                         "value": "[parameters('publicIpName')]"
                     },
                     "publicIPAddressType": {
-                        "value": "[variables('publicIpType')]"
+                        "value": "[parameters('publicIpType')]"
                     },
                     "dnsPrefix": {
                         "value": "[parameters('publicIpDNS')]"
@@ -498,7 +508,7 @@
                         "value": "[reference('SettingUpLoadbalancer').outputs.lbBackendID.value]"
                     },
                     "inboundNatID": {
-                        "value": "[concat(reference('SettingUpLoadbalancer').outputs.inboundNatIDPrefix.value, copyIndex())]"
+                        "value": "[concat(reference('SettingUpLoadbalancer').outputs.inboundNatIDPrefix.value, '-', copyIndex())]"
                     },
                     "networkSecurityGroupId": {
                         "value": "[resourceId('Microsoft.Compute/networkSecurityGroups',parameters('networkSecurityGroupName'))]"
