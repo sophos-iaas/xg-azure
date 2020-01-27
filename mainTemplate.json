@@ -243,13 +243,6 @@
             "metadata": {
                 "description": "Location to deploy. Default to use the same location as the Resource Group"
             }
-        },
-        "devFwBlobUrlPrefix": {
-            "type": "string",
-            "defaultValue": "",
-            "metadata": {
-                "description": "Dev Blob Url for testing only (Backward compatibility support.)"
-            }
         }
     },
     "variables": {
@@ -261,7 +254,6 @@
         "interfaceWanTemplate": "[uri(parameters('_artifactsLocation'), concat('nestedtemplates/interface-wan.json', parameters('_artifactsLocationSasToken')))]",
         "interfaceLanTemplate": "[uri(parameters('_artifactsLocation'), concat('nestedtemplates/interface-lan.json', parameters('_artifactsLocationSasToken')))]",
         "vmTemplate": "[uri(parameters('_artifactsLocation'), concat('nestedtemplates/vm.json', parameters('_artifactsLocationSasToken')))]",
-        "vmDevTemplate": "[uri(parameters('_artifactsLocation'), concat('nestedtemplates/vm_dev.json', parameters('_artifactsLocationSasToken')))]",
         "storageAccountId": "[resourceId(parameters('storageRG'), 'Microsoft.Storage/storageAccounts/', parameters('storageName'))]",
         "PubIpId": "[resourceId(parameters('publicIpRG'),'Microsoft.Network/publicIPAddresses',parameters('publicIpName'))]"
     },
@@ -484,7 +476,7 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[if(empty(parameters('devFwBlobUrlPrefix')), variables('vmTemplate'), variables('vmDevTemplate'))]",
+                    "uri": "[variables('vmTemplate')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
@@ -514,9 +506,6 @@
                     },
                     "location": {
                         "value": "[parameters('location')]"
-                    },
-                    "devFwBlobUrlPrefix": {
-                        "value": "[parameters('devFwBlobUrlPrefix')]"
                     }
                 }
             }

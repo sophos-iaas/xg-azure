@@ -253,13 +253,6 @@
             "metadata": {
                 "description": "Location to deploy. Default to use the same location as the Resource Group"
             }
-        },
-        "devFwBlobUrlPrefix": {
-            "type": "string",
-            "defaultValue": "",
-            "metadata": {
-                "description": "Dev Blob Url for testing only (Backward compatibility support.)"
-            }
         }
     },
     "variables": {
@@ -271,7 +264,6 @@
         "interfaceLanTemplate": "[uri(parameters('_artifactsLocation'), concat('nestedtemplates/interface-lan.json', parameters('_artifactsLocationSasToken')))]",
         "interfaceLBTemplate": "[uri(parameters('_artifactsLocation'), concat('nestedtemplates/interface-lb.json', parameters('_artifactsLocationSasToken')))]",
         "vmTemplate": "[uri(parameters('_artifactsLocation'), concat('nestedtemplates/vm.json', parameters('_artifactsLocationSasToken')))]",
-        "vmDevTemplate": "[uri(parameters('_artifactsLocation'), concat('nestedtemplates/vm_dev.json', parameters('_artifactsLocationSasToken')))]",
         "LBTemplate": "[uri(parameters('_artifactsLocation'), concat('nestedtemplates/loadbalancer.json', parameters('_artifactsLocationSasToken')))]",
         "securityRuleAllowHTTPTemplate": "[uri(parameters('_artifactsLocation'), concat('nestedtemplates/inboundSecurityRuleAllowHttp.json', parameters('_artifactsLocationSasToken')))]",
         "storageAccountId": "[resourceId(parameters('storageRG'), 'Microsoft.Storage/storageAccounts/', parameters('storageName'))]",
@@ -558,7 +550,7 @@
                 "count": "[parameters('numberOfInstances')]"
             },
             "dependsOn": [
-                "[if(empty(parameters('devFwBlobUrlPrefix')), 'SettingUpAvailabilitySet', if(equals(copyIndex(), 0), concat('Microsoft.Resources/deployments/', 'SettingUpAvailabilitySet'), concat('Microsoft.Resources/deployments/','SettingUpVm',sub(copyIndex(), 1) )))]",
+                "[if(equals(copyIndex(), 0), concat('Microsoft.Resources/deployments/', 'SettingUpAvailabilitySet'), concat('Microsoft.Resources/deployments/','SettingUpVm',sub(copyIndex(), 1) ))]",
                 "[concat('Microsoft.Resources/deployments/', 'SettingUpInterfaceWan', copyIndex())]",
                 "[concat('Microsoft.Resources/deployments/', 'SettingUpInterfaceLan', copyIndex())]",
                 "[concat('Microsoft.Resources/deployments/', 'SettingUpStorageAccount')]",
@@ -567,7 +559,7 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[if(empty(parameters('devFwBlobUrlPrefix')), variables('vmTemplate'), variables('vmDevTemplate'))]",
+                    "uri": "[variables('vmTemplate')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
@@ -597,9 +589,6 @@
                     },
                     "location": {
                         "value": "[parameters('location')]"
-                    },
-                    "devFwBlobUrlPrefix": {
-                        "value": "[parameters('devFwBlobUrlPrefix')]"
                     }
                 }
             }
