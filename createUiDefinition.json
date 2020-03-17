@@ -188,7 +188,7 @@
             "netNewOrExisting": "[steps('instanceDetails').vnetSpec.newOrExisting]",
             "netRG": "[steps('instanceDetails').vnetSpec.resourceGroup]",
             "netName": "[steps('instanceDetails').vnetSpec.name]",
-            "netPrefix": "[steps('instanceDetails').vnetSpec.addressPrefix]",
+            "netPrefix": "[first(steps('instanceDetails').vnetSpec.addressPrefixes)]",
             "wanName": "[steps('instanceDetails').vnetSpec.subnets.subnet1.name]",
             "wanPrefix": "[steps('instanceDetails').vnetSpec.subnets.subnet1.addressPrefix]",
             "lanName": "[steps('instanceDetails').vnetSpec.subnets.subnet2.name]",
