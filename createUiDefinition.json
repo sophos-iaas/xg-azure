@@ -112,19 +112,7 @@
                             "minAddressPrefixSize": "/29"
                         },
                         "subnets": {
-                            "subnet1": {
-                                "label": "WAN subnet",
-                                "defaultValue": {
-                                    "name": "WAN",
-                                    "addressPrefixSize": "/24"
-                                },
-                                "constraints": {
-                                    "minAddressPrefixSize": "/29",
-                                    "minAddressCount": 1,
-                                    "requireContiguousAddresses": true
-                                }
-                            },
-                            "subnet2": {
+                            "subnet-lan": {
                                 "label": "LAN subnet",
                                 "defaultValue": {
                                     "name": "LAN",
@@ -133,6 +121,18 @@
                                 "constraints": {
                                     "minAddressPrefixSize": "/29",
                                     "minAddressCount": 4,
+                                    "requireContiguousAddresses": true
+                                }
+                            },
+                            "subnet-wan": {
+                                "label": "WAN subnet",
+                                "defaultValue": {
+                                    "name": "WAN",
+                                    "addressPrefixSize": "/24"
+                                },
+                                "constraints": {
+                                    "minAddressPrefixSize": "/29",
+                                    "minAddressCount": 1,
                                     "requireContiguousAddresses": true
                                 }
                             }
@@ -188,11 +188,11 @@
             "netNewOrExisting": "[steps('instanceDetails').vnetSpec.newOrExisting]",
             "netRG": "[steps('instanceDetails').vnetSpec.resourceGroup]",
             "netName": "[steps('instanceDetails').vnetSpec.name]",
-            "netPrefix": "[steps('instanceDetails').vnetSpec.addressPrefix]",
-            "wanName": "[steps('instanceDetails').vnetSpec.subnets.subnet1.name]",
-            "wanPrefix": "[steps('instanceDetails').vnetSpec.subnets.subnet1.addressPrefix]",
-            "lanName": "[steps('instanceDetails').vnetSpec.subnets.subnet2.name]",
-            "lanPrefix": "[steps('instanceDetails').vnetSpec.subnets.subnet2.addressPrefix]",
+            "netPrefix": "[first(steps('instanceDetails').vnetSpec.addressPrefixes)]",
+            "wanName": "[steps('instanceDetails').vnetSpec.subnets.subnet-wan.name]",
+            "wanPrefix": "[steps('instanceDetails').vnetSpec.subnets.subnet-wan.addressPrefix]",
+            "lanName": "[steps('instanceDetails').vnetSpec.subnets.subnet-lan.name]",
+            "lanPrefix": "[steps('instanceDetails').vnetSpec.subnets.subnet-lan.addressPrefix]",
             "storageNewOrExisting": "[steps('instanceDetails').storageSpec.newOrExisting]",
             "storageRG": "[steps('instanceDetails').storageSpec.resourceGroup]",
             "storageName": "[steps('instanceDetails').storageSpec.name]",
