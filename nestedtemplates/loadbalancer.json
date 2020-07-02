@@ -10,6 +10,9 @@
         },
         "numberOfInstances": {
             "type": "int"
+        },
+        "location":{
+            "type": "string"
         }
     },
     "variables": {
@@ -18,17 +21,17 @@
         "inboundNatName": "Webadmin-XG",
         "probeName": "Probe-Webadmin-On-4444",
         "lbID": "[resourceId('Microsoft.Network/loadBalancers',parameters('loadBalancerName'))]",
-        "lbFrontendID": "[concat(variables('lbID'),'/frontendIPConfigurations/',variables('lbFrontendName'))]",
-        "lbBackendID": "[concat(variables('lbID'),'/backendAddressPools/',variables('lbBackendName'))]",
-        "lbProbeID": "[concat(variables('lbID'),'/probes/',variables('probeName'))]",
-        "inboundNatIDPrefix": "[concat(variables('lbID'),'/inboundNatRules/',variables('inboundNatName'),'-')]"
+        "lbFrontendID": "[resourceId('Microsoft.Network/loadBalancers/frontendIPConfigurations',parameters('loadBalancerName'), variables('lbFrontendName'))]",
+        "lbBackendID": "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools',parameters('loadBalancerName'), variables('lbBackendName'))]",
+        "lbProbeID": "[resourceId('Microsoft.Network/loadBalancers/probes',parameters('loadBalancerName'), variables('probeName'))]",
+        "inboundNatIDPrefix": "[resourceId('Microsoft.Network/loadBalancers/inboundNatRules', parameters('loadBalancerName'), variables('inboundNatName'))]"
     },
     "resources": [
         {
-            "apiVersion": "2016-03-30",
+            "apiVersion": "2019-08-01",
             "name": "[parameters('loadBalancerName')]",
             "type": "Microsoft.Network/loadBalancers",
-            "location": "[resourceGroup().location]",
+            "location": "[parameters('location')]",
             "properties": {
                 "frontendIPConfigurations": [
                     {
@@ -81,10 +84,10 @@
             }
         },
         {
-            "apiVersion": "2016-03-30",
+            "apiVersion": "2019-08-01",
             "name": "[concat(parameters('loadBalancerName'), '/', variables('inboundNatName'), '-', copyIndex())]",
             "type": "Microsoft.Network/loadBalancers/inboundNatRules",
-            "location": "[resourceGroup().location]",
+            "location": "[parameters('location')]",
             "copy": {
                 "name": "inboundNatLoop",
                 "count": "[parameters('numberOfInstances')]"

@@ -26,49 +26,26 @@
         "interfaceRefLan": {
             "type": "string"
         },
-        "devFwBlobUrlPrefix": {
+        "location":{
             "type": "string"
         }
     },
     "variables": {
         "imagePublisher": "sophos",
         "imageOffer": "sophos-xg",
-        "adminUsername": "azureuser",
-        "sshKeyPath": "[concat('/home/',variables('adminUsername'),'/.ssh/authorized_keys')]",
-        "vhdContainer": "vhds"
+        "adminUsername": "azureuser"
     },
     "resources": [
-       {
-            "apiVersion": "2017-03-30",
-            "type": "Microsoft.Compute/images",
-            "name": "disks",
-            "location": "[resourceGroup().location]",
-            "properties": {
-                "storageProfile": {
-                    "osDisk": {
-                        "osType": "Linux",
-                        "osState": "Generalized",
-                        "caching": "ReadWrite",
-                        "blobUri": "[concat(parameters('devFwBlobUrlPrefix'),'-prim.vhd')]",
-                        "storageAccountType": "Standard_LRS"
-                    },
-                    "dataDisks": [{
-                        "caching": "ReadWrite",
-                        "blobUri": "[concat(parameters('devFwBlobUrlPrefix'),'-aux.vhd')]",
-                        "lun": 0,
-                        "storageAccountType": "Standard_LRS"
-                    }]
-                }
-            }
-        },
         {
-            "apiVersion": "2017-03-30",
+            "apiVersion": "2019-07-01",
             "type": "Microsoft.Compute/virtualMachines",
             "name": "[parameters('vmName')]",
-            "location": "[resourceGroup().location]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Compute/images/', 'disks')]"
-            ],
+            "plan": {
+                "publisher": "[variables('imagePublisher')]",
+                "product": "[variables('imageOffer')]",
+                "name": "[parameters('imageSku')]"
+            },
+            "location": "[parameters('location')]",
             "properties": {
                 "availabilitySet": {
                     "id": "[parameters('availabilitySetId')]"
@@ -83,19 +60,28 @@
                 },
                 "storageProfile": {
                     "imageReference": {
-                        "id": "[resourceId('Microsoft.Compute/images/', 'disks')]"
+                        "publisher": "[variables('imagePublisher')]",
+                        "offer": "[variables('imageOffer')]",
+                        "sku": "[parameters('imageSku')]",
+                        "version": "latest"
                     },
                     "dataDisks": [
                         {
                             "name": "[concat(parameters('vmName'),'-dataDisk')]",
                             "lun": 0,
-                            "createOption": "FromImage"
+                            "createOption": "FromImage",
+                            "managedDisk": {
+                                "storageAccountType": "Standard_LRS"
+                            }
                         }
                     ],
                     "osDisk": {
                         "name": "[concat(parameters('vmName'),'-osDisk')]",
                         "caching": "ReadWrite",
-                        "createOption": "FromImage"
+                        "createOption": "FromImage",
+                        "managedDisk": {
+                            "storageAccountType": "Standard_LRS"
+                        }
                     }
                 },
                 "networkProfile": {

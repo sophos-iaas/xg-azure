@@ -4,16 +4,22 @@
     "parameters": {
         "availabilitySetName": {
             "type": "string"
+        },
+        "location": {
+            "type": "string"
         }
+    },
+    "variables": {
+        "regionsDomain3":  ["eastus", "eastus2", "westus", "centralus", "northcentralus", "southcentralus", "canadacentral", "northeurope", "westeurope"]
     },
     "resources": [
         {
             "type": "Microsoft.Compute/availabilitySets",
             "name": "[parameters('availabilitySetName')]",
-            "apiVersion": "2017-03-30",
-            "location": "[resourceGroup().location]",
+            "apiVersion": "2019-07-01",
+            "location": "[parameters('location')]",
             "properties": {
-                "platformFaultDomainCount": 3
+                "platformFaultDomainCount": "[if(contains(variables('regionsDomain3'), parameters('location')), 3, 2)]"
             },
             "sku": {
                 "name": "Aligned"

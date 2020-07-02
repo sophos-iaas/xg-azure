@@ -20,22 +20,20 @@
         "Subnet2Prefix": {
             "type": "string"
         },
-        "vnetExistingRGName": {
-            "type": "string",
-            "defaultValue": ""
+        "location":{
+            "type": "string"
         }
     },
     "variables": {
-        "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
-        "subnet1": "[concat(variables('vnetID'),'/subnets/',parameters('Subnet1Name'))]",
-        "subnet2": "[concat(variables('vnetID'),'/subnets/',parameters('Subnet2Name'))]"
+        "subnet1": "[resourceId('Microsoft.Network/virtualNetworks/subnets',parameters('virtualNetworkName'), parameters('Subnet1Name'))]",
+        "subnet2": "[resourceId('Microsoft.Network/virtualNetworks/subnets',parameters('virtualNetworkName'), parameters('Subnet2Name'))]"
     },
     "resources": [
         {
-            "apiVersion": "2016-06-01",
+            "apiVersion": "2019-08-01",
             "type": "Microsoft.Network/virtualNetworks",
             "name": "[parameters('virtualNetworkName')]",
-            "location": "[resourceGroup().location]",
+            "location": "[parameters('location')]",
             "properties": {
                 "addressSpace": {
                     "addressPrefixes": [

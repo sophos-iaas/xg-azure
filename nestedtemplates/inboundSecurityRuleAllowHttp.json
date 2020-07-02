@@ -7,14 +7,17 @@
         },
         "trustedNetwork": {
             "type": "string"
+        },
+        "location":{
+            "type": "string"
         }
     },
     "resources": [
         {
-            "apiVersion": "2016-06-01",
+            "apiVersion": "2019-09-01",
             "type": "Microsoft.Network/networkSecurityGroups/securityRules",
             "name": "[concat(parameters('networkSecurityGroupName'),'/allow_http')]",
-            "location": "[resourceGroup().location]",
+            "location": "[parameters('location')]",
             "properties": {
                 "protocol": "tcp",
                 "sourcePortRange": "*",

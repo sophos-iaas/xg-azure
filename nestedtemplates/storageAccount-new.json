@@ -15,23 +15,28 @@
             },
             "defaultValue": "Standard_LRS"
         },
-        "storageAccountExistingRG": {
-            "type": "string",
-            "metadata": {
-                "Description": "Resource Group Name of the existing Storage Account"
-            }
+        "location": {
+            "type": "string"
         }
     },
     "resources": [
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "name": "[parameters('storageAccountName')]",
+            "apiVersion": "2019-06-01",
+            "location": "[parameters('location')]",
+            "properties": {
 
+            },
+            "sku": {
+                "name": "[parameters('storageAccountType')]"
+            },
+            "kind": "Storage"
+        }
     ],
     "outputs": {
-        "storageAccountId": {
-            "value": "[resourceId(parameters('storageAccountExistingRG'),'Microsoft.Storage/StorageAccounts',parameters('storageAccountName'))]",
-            "type": "string"
-        },
         "storageAccountEndpoint": {
-            "value": "[reference(resourceId(parameters('storageAccountExistingRG'), 'Microsoft.Storage/storageAccounts/', parameters('storageAccountName')), '2016-01-01').primaryEndpoints.blob]",
+            "value": "[reference(parameters('storageAccountName'), '2019-06-01').primaryEndpoints.blob]",
             "type": "string"
         }
     }

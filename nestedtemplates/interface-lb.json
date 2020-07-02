@@ -7,15 +7,30 @@
         },
         "subnetRef": {
             "type": "string"
+        },
+        "lbBackendID": {
+            "type": "string"
+        },
+        "inboundNatID": {
+            "type": "string"
+        },
+        "networkSecurityGroupId": {
+            "type": "string"
+        },
+        "location":{
+            "type": "string"
         }
     },
     "resources": [
         {
-            "apiVersion": "2016-03-30",
+            "apiVersion": "2019-08-01",
             "type": "Microsoft.Network/networkInterfaces",
             "name": "[parameters('interfaceName')]",
-            "location": "[resourceGroup().location]",
+            "location": "[parameters('location')]",
             "properties": {
+                "networkSecurityGroup": {
+                    "id": "[parameters('networkSecurityGroupId')]"
+                },
                 "ipConfigurations": [
                     {
                         "name": "ipconfig",
@@ -23,7 +38,17 @@
                             "privateIPAllocationMethod": "Dynamic",
                             "subnet": {
                                 "id": "[parameters('subnetRef')]"
-                            }
+                            },
+                            "loadBalancerBackendAddressPools": [
+                                {
+                                    "id": "[parameters('lbBackendID')]"
+                                }
+                            ],
+                            "loadBalancerInboundNatRules": [
+                                {
+                                    "id": "[parameters('inboundNatID')]"
+                                }
+                            ]
                         }
                     }
                 ],
