@@ -13,6 +13,17 @@
         },
         "location":{
             "type": "string"
+        },
+        "publicIPAddressSku": {
+            "type": "string",
+            "defaultValue": "Standard",
+            "allowedValues": [
+                "Basic",
+                "Standard"
+            ],
+            "metadata": {
+                "description": "SKU of the Public IP Address"
+            }
         }
     },
     "resources": [
@@ -21,6 +32,9 @@
             "type": "Microsoft.Network/publicIPAddresses",
             "name": "[parameters('publicIPAddressName')]",
             "location": "[parameters('location')]",
+            "sku": {
+                "name": "[parameters('publicIPAddressSku')]"
+            },
             "properties": {
                 "publicIPAllocationMethod": "[parameters('publicIPAddressType')]",
                 "dnsSettings": {

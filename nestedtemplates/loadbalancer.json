@@ -13,6 +13,17 @@
         },
         "location":{
             "type": "string"
+        },
+        "publicIPAddressSku": {
+            "type": "string",
+            "defaultValue": "Standard",
+            "allowedValues": [
+                "Basic",
+                "Standard"
+            ],
+            "metadata": {
+                "description": "SKU of the Public IP Address"
+            }
         }
     },
     "variables": {
@@ -32,6 +43,9 @@
             "name": "[parameters('loadBalancerName')]",
             "type": "Microsoft.Network/loadBalancers",
             "location": "[parameters('location')]",
+            "sku": {
+                "name": "[parameters('publicIPAddressSku')]"
+            },
             "properties": {
                 "frontendIPConfigurations": [
                     {
