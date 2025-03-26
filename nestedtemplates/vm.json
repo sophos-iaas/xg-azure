@@ -32,7 +32,7 @@
     },
     "variables": {
         "imagePublisher": "sophos",
-        "imageOffer": "sophos-xg",
+        "imageOffer": "sophos firewall",
         "adminUsername": "azureuser"
     },
     "resources": [
