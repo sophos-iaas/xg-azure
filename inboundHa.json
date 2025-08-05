@@ -241,7 +241,7 @@
             "type": "int",
             "defaultValue": 2,
             "allowedValues": [
-                0,1,2,3,4,5
+                2
             ],
             "metadata": {
                 "description": "Number of XG Firewall instances to be deployed."
