@@ -37,7 +37,7 @@
     },
     "resources": [
         {
-            "apiVersion": "2019-07-01",
+            "apiVersion": "2024-03-01",
             "type": "Microsoft.Compute/virtualMachines",
             "name": "[parameters('vmName')]",
             "plan": {
@@ -71,7 +71,7 @@
                             "lun": 0,
                             "createOption": "FromImage",
                             "managedDisk": {
-                                "storageAccountType": "Standard_LRS"
+                                "storageAccountType": "StandardSSD_LRS"
                             }
                         }
                     ],
@@ -80,7 +80,7 @@
                         "caching": "ReadWrite",
                         "createOption": "FromImage",
                         "managedDisk": {
-                            "storageAccountType": "Standard_LRS"
+                            "storageAccountType": "StandardSSD_LRS"
                         }
                     }
                 },
