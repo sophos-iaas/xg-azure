@@ -48,18 +48,20 @@
     "variables": {
         "lbFrontendName": "loadBalancerFrontEnd",
         "lbBackendName": "loadBalancerBackEnd",
-        "inboundNatName": "Webadmin-XG",
+        "inboundNatNameUI": "Webadmin-Sophos-Firewall",
+        "inboundNatNameSSH": "SSH-Sophos-Firewall",
         "probeName": "Probe-Webadmin-On-4444",
         "lbID": "[resourceId('Microsoft.Network/loadBalancers',parameters('loadBalancerName'))]",
         "lbFrontendID": "[resourceId('Microsoft.Network/loadBalancers/frontendIPConfigurations',parameters('loadBalancerName'), variables('lbFrontendName'))]",
         "lbBackendID": "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools',parameters('loadBalancerName'), variables('lbBackendName'))]",
         "lbProbeID": "[resourceId('Microsoft.Network/loadBalancers/probes',parameters('loadBalancerName'), variables('probeName'))]",
-        "inboundNatIDPrefix": "[resourceId('Microsoft.Network/loadBalancers/inboundNatRules', parameters('loadBalancerName'), variables('inboundNatName'))]",
+        "inboundNatIDPrefixUI": "[resourceId('Microsoft.Network/loadBalancers/inboundNatRules', parameters('loadBalancerName'), variables('inboundNatNameUI'))]",
+        "inboundNatIDPrefixSSH": "[resourceId('Microsoft.Network/loadBalancers/inboundNatRules', parameters('loadBalancerName'), variables('inboundNatNameSSH'))]",
         "outboundRuleID": "[resourceId('Microsoft.Network/loadBalancers/outboundRules', parameters('loadBalancerName'), parameters('outboundRuleName'))]"
     },
     "resources": [
         {
-            "apiVersion": "2019-08-01",
+            "apiVersion": "2022-07-01",
             "name": "[parameters('loadBalancerName')]",
             "type": "Microsoft.Network/loadBalancers",
             "location": "[parameters('location')]",
@@ -138,14 +140,10 @@
             }
         },
         {
-            "apiVersion": "2019-08-01",
-            "name": "[concat(parameters('loadBalancerName'), '/', variables('inboundNatName'), '-', copyIndex())]",
+            "apiVersion": "2022-07-01",
+            "name": "[concat(parameters('loadBalancerName'), '/', variables('inboundNatNameUI'))]",
             "type": "Microsoft.Network/loadBalancers/inboundNatRules",
             "location": "[parameters('location')]",
-            "copy": {
-                "name": "inboundNatLoop",
-                "count": "[parameters('numberOfInstances')]"
-            },
             "dependsOn": [
                 "[concat('Microsoft.Network/loadBalancers/', parameters('loadBalancerName'))]"
             ],
@@ -153,10 +151,40 @@
                 "frontendIPConfiguration": {
                     "id": "[variables('lbFrontendID')]"
                 },
-                "protocol": "tcp",
-                "frontendPort": "[copyIndex(4444)]",
+                "backendAddressPool": {
+                    "id": "[variables('lbBackendID')]"
+                },
+                "protocol": "Tcp",
+                "frontendPortRangeStart": 4444,
+                "frontendPortRangeEnd": 4445,
                 "backendPort": 4444,
-                "enableFloatingIP": false
+                "enableFloatingIP": false,
+                "enableTcpReset": false,
+                "idleTimeoutInMinutes": 4
+            }
+        },
+        {
+            "apiVersion": "2022-07-01",
+            "name": "[concat(parameters('loadBalancerName'), '/', variables('inboundNatNameSSH'))]",
+            "type": "Microsoft.Network/loadBalancers/inboundNatRules",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/loadBalancers/', parameters('loadBalancerName'))]"
+            ],
+            "properties": {
+                "frontendIPConfiguration": {
+                    "id": "[variables('lbFrontendID')]"
+                },
+                "backendAddressPool": {
+                    "id": "[variables('lbBackendID')]"
+                },
+                "protocol": "Tcp",
+                "frontendPortRangeStart": 2222,
+                "frontendPortRangeEnd": 2223,
+                "backendPort": 22,
+                "enableFloatingIP": false,
+                "enableTcpReset": false,
+                "idleTimeoutInMinutes": 4
             }
         }
     ],
@@ -173,8 +201,12 @@
             "value": "[variables('lbBackendID')]",
             "type": "string"
         },
-        "inboundNatIDPrefix": {
-            "value": "[variables('inboundNatIDPrefix')]",
+        "inboundNatIDPrefixUI": {
+            "value": "[variables('inboundNatIDPrefixUI')]",
+            "type": "string"
+        },
+        "inboundNatIDPrefixSSH": {
+            "value": "[variables('inboundNatIDPrefixSSH')]",
             "type": "string"
         },
         "outboundRuleID": {
