@@ -31,10 +31,10 @@
         },
         "imageSku": {
             "type": "string",
-            "defaultValue": "byol",
+            "defaultValue": "byol-gen2",
             "allowedValues": [
-                "byol",
-                "payg-new"
+                "byol-gen2",
+                "payg-gen2"
             ],
             "metadata": {
                 "description": "License type to use."

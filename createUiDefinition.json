@@ -53,11 +53,11 @@
                             "allowedValues": [
                                 {
                                     "label": "BYOL",
-                                    "value": "byol"
+                                    "value": "byol-gen2"
                                 },
                                 {
                                     "label": "PAYG",
-                                    "value": "payg-new"
+                                    "value": "payg-gen2"
                                 }
                             ]
                         }

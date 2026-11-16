@@ -1,5 +1,5 @@
 # xg-azure
-Deployment template to deploy Sophos XG firewall to Azure
+Deployment template to deploy Sophos Firewall as a Gen 2 VM on Azure in dual ARM mode.
 
 Deploying
 =========
